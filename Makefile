@@ -34,7 +34,7 @@ $(LEXCODE) : $(LEXFILE)
 
 
 clean : 
-	rm -f $(TARGETS) $(OBJS)
+	rm -f $(TARGETS) $(OBJS) $(LEXCODE)
 
 install:
 	install -C $(TARGETS) $(TARGETDIR)
