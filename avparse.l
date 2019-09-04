@@ -23,6 +23,7 @@
      ALTIMETER = 264,
      EOL = 275,
      UNKNOWN = 276
+
    };
 %}
 
