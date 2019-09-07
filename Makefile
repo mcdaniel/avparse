@@ -8,6 +8,7 @@
 # Environment Setup
 
 # Other parts
+INCLUDES=-I.
 CC=gcc
 CFLAGS=-c $(INCLUDES) -g -Wall 
 LINK=gcc
@@ -18,7 +19,11 @@ LINKFLAGS=-L/opt/local/lib
 
 LEXFILE=	avparse.l
 LEXCODE=	avparse.yy.c
-OBJS=		avparse.yy.o
+BISONFILE=	avparse.y
+BISONCODE=	avparse.tab.c
+BISONDEFS=	avparse.tab.h
+OBJS=		$(BISONCODE:.c=.o) \
+			$(LEXCODE:.c=.o)
 TARGETS=	avparse
 
 #
@@ -26,15 +31,18 @@ TARGETS=	avparse
 
 all : $(TARGETS)
 
-avparse: $(OBJS)
+avparse : $(OBJS)
 	$(LINK) $(LINKFLAGS) -o $@ $(OBJS) -lfl
+
+
+$(BISONCODE) : $(BISONFILE)
+	bison -d --debug avparse.y
 
 $(LEXCODE) : $(LEXFILE)
 	flex -o $(LEXCODE) $(LEXFILE)
 
-
 clean : 
-	rm -f $(TARGETS) $(OBJS) $(LEXCODE)
+	rm -f $(TARGETS) $(OBJS) $(LEXCODE) $(BISONCODE) $(BISONDEFS)
 
 install:
 	install -C $(TARGETS) $(TARGETDIR)
