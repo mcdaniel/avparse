@@ -20,13 +20,13 @@
 
 %% /* The recognition tokens for the aviation data */
 
-[A-Z]{4}                                { return AIRPORT; }
-[0-9]{6}Z                               { return ZULUTIME; }
-[0-9]{1,2}(SM|NM)                       { return VISIBILITY; }
-[0-9]{3}[0-9]{2}(G[0-9]{2})?KT          { return WIND; }
-(SKC|CLR)|((FEW|SCT|BKN|OVC)[0-9]{3})   { return COVERAGE; }
-M?[0-9]{2}\/M?[0-9]{2}                  { return TEMPERATURE; }
-A[0-9]{4}                               { return ALTIMETER; }
+[A-Z]{4}                                { yylval.strval = strdup(yytext); return AIRPORT; }
+[0-9]{6}Z                               { yylval.strval = strdup(yytext); return ZULUTIME; }
+[0-9]{1,2}(SM|NM)                       { yylval.strval = strdup(yytext); return VISIBILITY; }
+[0-9]{3}[0-9]{2}(G[0-9]{2})?KT          { yylval.strval = strdup(yytext); return WIND; }
+(SKC|CLR)|((FEW|SCT|BKN|OVC)[0-9]{3})   { yylval.strval = strdup(yytext); return COVERAGE; }
+M?[0-9]{2}\/M?[0-9]{2}                  { yylval.strval = strdup(yytext); return TEMPERATURE; }
+A[0-9]{4}                               { yylval.strval = strdup(yytext); return ALTIMETER; }
 \n                                      { return EOL; }
 [ \t]                                   { /* Ignore white space */ }
 [^\t\n ]+                               { return UNKNOWN; }
