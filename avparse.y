@@ -29,7 +29,7 @@ void yyerror(char *s);
 extern char *yytext;
 %}
 
-/* Declare all of the types of parsed values*
+/* Declare all of the types of parsed values */
 %union {
 	int    intval;
 	char  *strval
@@ -43,23 +43,25 @@ extern char *yytext;
 %token <strval> COVERAGE
 %token <strval> TEMPERATURE
 %token <strval> ALTIMETER
-%token EOL
-%token UNKNOWN
+%token <intval> EOL
+%token <intval> UNKNOWN
 
 %%
 
 avmetar: 
 	avmetar_expression
-	| avmetar avmetar_expression	
+	| avmetar avmetar_expression
+	;
 
 avmetar_expression:
 	AIRPORT ZULUTIME WIND VISIBILITY covexpr TEMPERATURE ALTIMETER EOL {
-		printf( "Airport: [%d]\n", $1 ); /* free( $1 ); */
+		printf( "Airport: [%s]\n", $1 ); /* free( $1 ); */
 	}
+	;
 
 covexpr: COVERAGE
 	| covexpr COVERAGE
-
+	;
 
 %%
 
