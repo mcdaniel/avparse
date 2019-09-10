@@ -32,7 +32,7 @@ extern char *yytext;
 /* Declare all of the types of parsed values */
 %union {
 	int    intval;
-	char  *strval
+	char  *strval;
 }
 
 /* Declare the tokens we will be using */
