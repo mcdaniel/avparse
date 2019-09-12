@@ -13,6 +13,7 @@
 // Includes
 #include <stdio.h>
 #include <unistd.h>
+#include <avfldparse.h>
 
 // Definitions
 #define YYDEBUG 1 // Enable parsing 
@@ -24,15 +25,18 @@
 	"    -h - help mode (display this message)\n" \
     "    -d - debug mode (enables parse trace)\n\n"
 
-// Functional prototypes (to keep the compiler happy)
+// Functional prototypes (to keep the compiler happy) */
 void yyerror(char *s);
 extern char *yytext;
+
+avparser_out *rule;
+
 %}
 
 /* Declare all of the types of parsed values */
 %union {
 	int    intval;
-	char  *strval
+	char  *strval;
 }
 
 /* Declare the tokens we will be using */
@@ -40,6 +44,7 @@ extern char *yytext;
 %token <strval> ZULUTIME
 %token <strval> VISIBILITY
 %token <strval> WIND
+%token <strval> WINDGUST
 %token <strval> COVERAGE
 %token <strval> TEMPERATURE
 %token <strval> ALTIMETER
@@ -54,9 +59,16 @@ avmetar:
 	;
 
 avmetar_expression:
-	AIRPORT ZULUTIME WIND VISIBILITY covexpr TEMPERATURE ALTIMETER EOL {
+	AIRPORT ZULUTIME wind VISIBILITY covexpr TEMPERATURE ALTIMETER EOL {
 		printf( "Airport: [%s]\n", $1 ); /* free( $1 ); */
+		rule = init_avparser_struct();
 	}
+	;
+
+wind:
+	WIND
+	|
+	WINDGUST
 	;
 
 covexpr: COVERAGE

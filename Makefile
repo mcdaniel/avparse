@@ -23,8 +23,15 @@ BISONFILE=	avparse.y
 BISONCODE=	avparse.tab.c
 BISONDEFS=	avparse.tab.h
 OBJS=		$(BISONCODE:.c=.o) \
-			$(LEXCODE:.c=.o)
+			$(LEXCODE:.c=.o) \
+			avfldparse.o
 TARGETS=	avparse
+
+# Suffix rules
+.SUFFIXES: .c .o
+
+.c.o:
+	$(CC) $(CFLAGS) -o $@ $<
 
 #
 # Project Protections
