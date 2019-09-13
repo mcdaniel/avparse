@@ -1,8 +1,8 @@
 /*//////////////////////////////////////////////////////////////////////////////
 //
-//  File          : avparse.l
-//  Description   : This file grammar definition code for the aviation parsing
-//                  library.
+//  File          : avparse.y
+//  Description   : This aviation grammar definition code for the aviation 
+//                  weather reporting parsing library.
 //
 //   Author       : Patrick McDaniel (pdmcdan@gmail.com)
 //   Created      : Sat Sep  7 08:53:47 EDT 2019
@@ -35,8 +35,9 @@ avparser_out *rule;
 
 /* Declare all of the types of parsed values */
 %union {
-	int    intval;
-	char  *strval;
+	int           intval;
+	char         *strval;
+	avparser_out *parsed;
 }
 
 /* Declare the tokens we will be using */
@@ -51,6 +52,8 @@ avparser_out *rule;
 %token <intval> EOL
 %token <intval> UNKNOWN
 
+%type <parsed> avmetar_expression
+
 %%
 
 avmetar: 
@@ -62,6 +65,7 @@ avmetar_expression:
 	AIRPORT ZULUTIME wind VISIBILITY covexpr TEMPERATURE ALTIMETER EOL {
 		printf( "Airport: [%s]\n", $1 ); /* free( $1 ); */
 		rule = init_avparser_struct();
+		$$ = rule;
 	}
 	;
 
