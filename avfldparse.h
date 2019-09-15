@@ -14,7 +14,10 @@
 
 /** Functional Prototypes **/
 
-avparser_out * init_avparser_struct( void );  /* allocate/initialize the avparser structure */
+avparser_out * allocate_avparser_struct( void );
+void release_avparser_struct( avparser_out *avp );
+avreading *allocate_avparser_reading( void );
+void release_avparser_reading( avreading *avr );
 
 #define AVFLDPARSE_INCLUDED
 #endif

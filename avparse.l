@@ -14,6 +14,7 @@
 
 // Includes
 #include <stdio.h>
+#include <avparse.h>
 #include <avparse.tab.h>
 
 %}

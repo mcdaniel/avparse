@@ -10,13 +10,17 @@
 */
 
 /** Include Files **/
+#include <stdio.h>
+
+/** Macros **/
+#define AVPARSE_FATAL_ERROR(s) fprintf(stderr, "%s at %s, line %d aborting.\n", s, __FILE__, __LINE__);
 
 /** Definitions and Types **/
 
 /* Structure for a single reading */
 typedef struct avr_struct {
 	char                      *field;  // The airfield of the reading
-	struct avr_struct *next;   // The next item in the structure
+	struct avr_struct         *next;   // The next item in the structure
 } avreading;
 
 /* Structure for holding all of the readings parsed */

@@ -13,6 +13,7 @@
 // Includes
 #include <stdio.h>
 #include <unistd.h>
+#include <avparse.h>
 #include <avfldparse.h>
 
 // Definitions
@@ -29,7 +30,7 @@
 void yyerror(char *s);
 extern char *yytext;
 
-avparser_out *rule;
+avparser_out *avout;
 
 %}
 
@@ -37,7 +38,7 @@ avparser_out *rule;
 %union {
 	int           intval;
 	char         *strval;
-	avparser_out *parsed;
+	avreading    *parsed;
 }
 
 /* Declare the tokens we will be using */
@@ -63,9 +64,15 @@ avmetar:
 
 avmetar_expression:
 	AIRPORT ZULUTIME wind VISIBILITY covexpr TEMPERATURE ALTIMETER EOL {
+		$$ = allocate_avparser_reading();
+		if (avout->readings == NULL) {
+			avout->readings = avout->tail = $$;
+		} else {
+			$$->next = avout->tail;
+			avout->tail = $$;
+		}
+		$$->field = $1;
 		printf( "Airport: [%s]\n", $1 ); /* free( $1 ); */
-		rule = init_avparser_struct();
-		$$ = rule;
 	}
 	;
 
@@ -104,8 +111,12 @@ int main(int argc, char **argv) {
             }
     }
 
-	// Process the inputs
+	// Setup the base structure, process the inputs
+	avout = allocate_avparser_struct();
 	yyparse();
+	print_parsed_input(avout);
+	release_avparser_struct(avout);
+
 	return( 0 );
 }
 
