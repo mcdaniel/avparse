@@ -17,9 +17,17 @@
 
 /** Definitions and Types **/
 
+/* Time structure for aviation reports */
+typedef struct avr_time_struct {
+	time_t zulu;
+	time_t local;
+} avreading_time;
+
+
 /* Structure for a single reading */
 typedef struct avr_struct {
 	char                      *field;  // The airfield of the reading
+	avreading_time             ztime;  // The Zulu time of the reading
 	struct avr_struct         *next;   // The next item in the structure
 } avreading;
 

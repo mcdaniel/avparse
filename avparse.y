@@ -18,7 +18,7 @@
 
 // Definitions
 #define YYDEBUG 1 // Enable parsing 
-#define AVPARSE_ARGUMENTS "hd"
+#define AVPARSE_ARGUMENTS "hdf:"
 #define AVPARSE_USAGE \
     "\nUSAGE: avparse [-h] [-d]\n" \
     "\n" \
@@ -31,6 +31,7 @@ void yyerror(char *s);
 extern char *yytext;
 
 avparser_out *avout;
+FILE *yyin;
 
 %}
 
@@ -67,12 +68,14 @@ avmetar_expression:
 		$$ = allocate_avparser_reading();
 		if (avout->readings == NULL) {
 			avout->readings = avout->tail = $$;
+			avout->no_readings = 1;
 		} else {
-			$$->next = avout->tail;
+			avout->tail->next = $$;
 			avout->tail = $$;
+			avout->no_readings ++;
 		}
 		$$->field = $1;
-		printf( "Airport: [%s]\n", $1 ); /* free( $1 ); */
+		printf( "Airport: [X %s]\n", $$->field ); /* free( $1 ); */
 	}
 	;
 
@@ -91,7 +94,7 @@ covexpr: COVERAGE
 int main(int argc, char **argv) {
 
 	// Local variables
-	char ch;
+	char ch, *infile;
 
 	// Process the command line parameters
     while ((ch = getopt(argc, argv, AVPARSE_ARGUMENTS)) != -1) {
@@ -105,10 +108,21 @@ int main(int argc, char **argv) {
 					yydebug = 1;
                     break;
 
+            case 'f': // File input
+            		infile = optarg;
+            		break;
+
             default:  // Default (unknown)
                     fprintf( stderr, "Unknown command line option (%c), aborting.\n", ch );
                     return( -1 );
             }
+    }
+
+    // Setup the input for the parser
+    if ( infile == NULL ) {
+    	yyin = stdin;
+    } else {
+    	yyin =  fopen(infile, "r");
     }
 
 	// Setup the base structure, process the inputs

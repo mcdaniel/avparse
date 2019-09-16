@@ -89,7 +89,7 @@ avreading *allocate_avparser_reading( void ) {
 
 	/* Create structure if allocation successful */
 	if ( (out = malloc(sizeof(avreading))) == NULL ) {
-		AVPARSE_FATAL_ERROR("Memory allocation failed, aborting");
+		AVPARSE_FATAL_ERROR("Memory allocation failed");
 		exit(-1);
 	}
 
@@ -116,10 +116,47 @@ void release_avparser_reading( avreading *avr ) {
 	return;
 }
 
+/****
+
+	Parsing Functions 
+
+****/
+
+/*/////////////////////////////////////////////////////////////////////////////
+//
+// Function     : parse_zulu_time
+// Description  : parse the zulu time from the metar reading
+//
+// Inputs       : tstr - the string containing the time data
+//              : avt - the time structure to read into
+// Outputs      : the time (converted to local time)
+*/
+
+int parse_zulu_time( char *tstr, avreading_time *avt ) {
+
+	/* Local variables */
+	int day, hr, mn;
+	char tempstr[128];
+	time_t ztm;
+	struct tm *ltime;
+
+	/* Scan out the data */
+	if ( sscanf(tstr, "%2d%2d%2dZ", &day, &hr, &mn) != 3 ) {
+		snprintf(tempstr, 128, "Bad ZULU time in aviation data [%s]", tstr);
+		AVPARSE_FATAL_ERROR(tempstr);
+		exit(-1);
+	}
+
+	/* Get the local time, find the offset */
+	ltime = localtime (NULL);
+
+
+}
+
 
 /****
 
-	Data Processsing / Debug Functions 
+	Output / Debug Functions 
 
 ****/
 
@@ -140,8 +177,11 @@ char * avreading_to_string( avreading *avr, int ind ) {
 
 	/* Add the fields */
 	outstr = malloc(1024);
+	memset(outstr, 0x0, 1024);
+	snprintf(tempstr, 256, "READING:\n");
+	strncat(outstr, tempstr, 1024);
 	snprintf(tempstr, 256, "%*sField: %s\n", ind, "", avr->field);
-	strncat(outstr, tempstr, 2014);
+	strncat(outstr, tempstr, 1024);
 
 	/* Return the new string */
 	return(outstr);
@@ -161,17 +201,17 @@ void print_parsed_input( avparser_out *avp ) {
 	/* Local variables */
 	char *outstr, *tstr, tempstr[256];
 	avreading *ptr;
+	int lineno = 0;
 
 	/* Add the fields */
 	outstr = malloc(4096);
-	snprintf(tempstr, 256, "READING:\n");
-	strncat(outstr, tempstr, 4096);
+	memset(outstr, 0x0, 4096);
 
 	/* Walk the readings, convert to string and print out */
 	ptr = avp->readings;
 	while (ptr != NULL) {
 		tstr = avreading_to_string(ptr, 2);
-		strncat(outstr, tempstr, 4096);
+		strncat(outstr, tstr, 4096);
 		free(tstr);
 		ptr = ptr->next;
 	}
