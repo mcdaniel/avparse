@@ -149,7 +149,7 @@ int parse_zulu_time( char *tstr, avreading_time *avt ) {
 
 	/* Get the local time, find the offset */
 	ltime = localtime (NULL);
-
+https://www.gnu.org/software/libc/manual/html_node/Broken_002ddown-Time.html
 
 }
 
