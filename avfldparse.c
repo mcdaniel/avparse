@@ -11,6 +11,7 @@
 /* Includes */
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <avfldparse.h>
 
 /* Functions */
@@ -132,12 +133,12 @@ void release_avparser_reading( avreading *avr ) {
 // Outputs      : the time (converted to local time)
 */
 
-int parse_zulu_time( char *tstr, avreading_time *avt ) {
+time_t parse_zulu_time( char *tstr, avreading_time *avt ) {
 
 	/* Local variables */
 	int day, hr, mn;
 	char tempstr[128];
-	time_t ztm;
+	time_t now, ztm, zulutime;
 	struct tm *ltime;
 
 	/* Scan out the data */
@@ -148,9 +149,12 @@ int parse_zulu_time( char *tstr, avreading_time *avt ) {
 	}
 
 	/* Get the local time, find the offset */
-	ltime = localtime (NULL);
-https://www.gnu.org/software/libc/manual/html_node/Broken_002ddown-Time.html
+	now = time(NULL);
+	ltime = localtime(&now);
+	printf( "The local offset is %ld [%s]\n.", ltime->tm_gmtoff, ltime->tm_zone );
+/* https://www.gnu.org/software/libc/manual/html_node/Broken_002ddown-Time.html */
 
+	return( zulutime );
 }
 
 

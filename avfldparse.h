@@ -10,6 +10,7 @@
 */
 
 /** Include Files **/
+#include <time.h>
 #include <avparse.h>
 
 /** Functional Prototypes **/
@@ -19,6 +20,7 @@ avparser_out * allocate_avparser_struct( void );
 void release_avparser_struct( avparser_out *avp );
 avreading *allocate_avparser_reading( void );
 void release_avparser_reading( avreading *avr );
+time_t parse_zulu_time( char *tstr, avreading_time *avt );
 
 /* Output / Debug Functions  */
 char * avreading_to_string( avreading *avr, int ind );

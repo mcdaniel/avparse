@@ -11,6 +11,8 @@
 
 /** Include Files **/
 #include <stdio.h>
+#include <time.h>
+
 
 /** Macros **/
 #define AVPARSE_FATAL_ERROR(s) fprintf(stderr, "%s at %s, line %d aborting.\n", s, __FILE__, __LINE__);
