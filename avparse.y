@@ -75,7 +75,7 @@ avmetar_expression:
 			avout->no_readings ++;
 		}
 		$$->field = $1;
-		parse_zulu_time($2, NULL);
+		parse_zulu_time($2, &$$->rtime);
 		
 		printf( "Airport: [X %s]\n", $$->field ); /* free( $1 ); */
 	}

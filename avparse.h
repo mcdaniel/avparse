@@ -29,7 +29,7 @@ typedef struct avr_time_struct {
 /* Structure for a single reading */
 typedef struct avr_struct {
 	char                      *field;  // The airfield of the reading
-	avreading_time             ztime;  // The Zulu time of the reading
+	avreading_time             rtime;  // The time of the reading
 	struct avr_struct         *next;   // The next item in the structure
 } avreading;
 

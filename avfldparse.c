@@ -138,8 +138,8 @@ time_t parse_zulu_time( char *tstr, avreading_time *avt ) {
 	/* Local variables */
 	int day, hr, mn;
 	char tempstr[128];
-	time_t now, ztm, zulutime;
-	struct tm *ltime;
+	struct tm *ltime, adjtime;
+	time_t now;
 
 	/* Scan out the data */
 	if ( sscanf(tstr, "%2d%2d%2dZ", &day, &hr, &mn) != 3 ) {
@@ -151,12 +151,33 @@ time_t parse_zulu_time( char *tstr, avreading_time *avt ) {
 	/* Get the local time, find the offset */
 	now = time(NULL);
 	ltime = localtime(&now);
-	printf( "The local offset is %ld [%s]\n.", ltime->tm_gmtoff, ltime->tm_zone );
+	printf( "The local offset is %ld [%s], zulu time = %s\n.", ltime->tm_gmtoff, ltime->tm_zone, tstr );
+
+	/* Setup time to adjust */
+	adjtime.tm_sec = 0;
+	adjtime.tm_min = mn;
+	adjtime.tm_hour = hr;
+	adjtime.tm_mday = day;
+	adjtime.tm_year = ltime->tm_year;
+	adjtime.tm_mon = ltime->tm_mon;
+
+	/* Check to see if month and/or year rolled over */
+	if ( (day != ltime->tm_mday) && (day < ltime->tm_mday) ) {
+		adjtime.tm_mon = ltime->tm_mon + 1;
+		if ( ltime->tm_year == 12 ) {
+			adjtime.tm_year = ltime->tm_year + 1;
+		}
+	}
+
+	avt->zulu = mktime(&adjtime);
+	avt->local = avt->zulu + ltime->tm_gmtoff;
+	printf( "The adjusted Zulu time is %s\n", ctime(&avt->zulu));
+
+
 /* https://www.gnu.org/software/libc/manual/html_node/Broken_002ddown-Time.html */
 
-	return( zulutime );
+	return( avt->zulu );
 }
-
 
 /****
 
@@ -185,6 +206,10 @@ char * avreading_to_string( avreading *avr, int ind ) {
 	snprintf(tempstr, 256, "READING:\n");
 	strncat(outstr, tempstr, 1024);
 	snprintf(tempstr, 256, "%*sField: %s\n", ind, "", avr->field);
+	strncat(outstr, tempstr, 1024);
+	snprintf(tempstr, 256, "%*sZulu time: %s\n", ind, "", ctime(&avr->rtime.zulu));
+	strncat(outstr, tempstr, 1024);
+	snprintf(tempstr, 256, "%*sLocal time: %s\n", ind, "", ctime(&avr->rtime.local));
 	strncat(outstr, tempstr, 1024);
 
 	/* Return the new string */
