@@ -21,16 +21,23 @@
 
 /* Time structure for aviation reports */
 typedef struct avr_time_struct {
-	time_t zulu;
-	time_t local;
+	time_t zulu;  /* GMT/Zulu time */
+	time_t local; /* The local time */
 } avreading_time;
 
+/* Wind structure */
+typedef struct avr_wind_struct {
+	int speed;     /* The wind speed, in kts */
+	int direction; /* The wind direction (0-359) */
+	int gust;      /* The wind gust, if applicable (-1 no gust) */
+} avreading_wind;
 
 /* Structure for a single reading */
 typedef struct avr_struct {
-	char                      *field;  // The airfield of the reading
-	avreading_time             rtime;  // The time of the reading
-	struct avr_struct         *next;   // The next item in the structure
+	char                      *field;  /* The airfield of the reading */
+	avreading_time             rtime;  /* The time of the reading */
+	avreading_wind             rwind;  /* THe wind reading */
+	struct avr_struct         *next;   /* The next item in the structure */
 } avreading;
 
 /* Structure for holding all of the readings parsed */

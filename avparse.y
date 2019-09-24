@@ -20,9 +20,10 @@
 #define YYDEBUG 1 // Enable parsing 
 #define AVPARSE_ARGUMENTS "hdf:"
 #define AVPARSE_USAGE \
-    "\nUSAGE: avparse [-h] [-d]\n" \
+    "\nUSAGE: avparse [-f <input file>] [-h] [-d]\n" \
     "\n" \
     "where:\n" \
+	"    -f - use file input from text file, where <input file> is the filename.\n" \
 	"    -h - help mode (display this message)\n" \
     "    -d - debug mode (enables parse trace)\n\n"
 
@@ -82,7 +83,12 @@ avmetar_expression:
 	;
 
 wind:
-	WIND
+	WIND {
+
+NOTE: what I need to do here is create wind structure, then pass it back, and copy on reception.
+
+		parse_wind($1, &$$->rwind);
+	}
 	|
 	WINDGUST
 	;
