@@ -241,6 +241,59 @@ int parse_visibility( char *tstr ) {
 	return( vis );
 }
 
+/*/////////////////////////////////////////////////////////////////////////////
+//
+// Function     : parse_coverage
+// Description  : parse the coverage information from a textual data
+//
+// Inputs       : cstr - the string containing the coverage data
+// Outputs      : pointer to coverage information
+*/
+
+avr_coverage * parseCloudLayer( char *cstr ) {
+
+	/* Local variables */
+	avr_coverage *coverage;
+	char cvg[4], tempstr[128];
+	int error = 0;
+
+	/* Allocate coverage information structure, scan data */
+	coverage = malloc(sizeof(avr_coverage));
+    if ( sscanf(cstr, "%3s%3u", cvg, &coverage->altitude ) != 2 ) {
+    	error = 1;
+    } else {
+
+	    // Adjust altitude, process the coverage description
+	    coverage->altitude *= 100;
+	    if ( strlen(cvg) != 3 ) {
+	    	error = 1;
+	    } else if ( (strncasecmp(cvg, "SKC", 3) == 0) || (strncasecmp(cvg, "CLR", 3) == 0) ) {
+	    	coverage->coverage = AVR_SKYCLEAR;
+	    } else if ( strncasecmp(cvg, "FEW", 3) == 0 ) {
+	    	coverage->coverage = AVR_FEW;
+	    } else if ( strncasecmp(cvg, "SCT", 3) == 0 ) {
+	    	coverage->coverage = AVR_SCATTERED;
+	    } else if ( strncasecmp(cvg, "BKN", 3) == 0 ) {
+	    	coverage->coverage = AVR_BROKEN;
+	    } else if ( strncasecmp(cvg, "OVC", 3) == 0 ) {
+	    	coverage->coverage = AVR_OVERCAST;
+	    } else {
+	    	error = 1;
+	    }
+
+	}
+
+    /* Check for error, bail out as necessary */
+    if ( error ) {
+		snprintf(tempstr, 128, "Bad coverage data in aviation data [%s]", cstr);
+		AVPARSE_FATAL_ERROR(tempstr);
+		exit(-1);
+    }
+
+    // Return the processed coverage 
+    return( coverage );
+}
+
 /****
 
 	Output / Debug Functions 
@@ -281,6 +334,17 @@ char * avreading_to_string( avreading *avr, int ind ) {
 	strncat(outstr, tempstr, 1024);
 	snprintf(tempstr, 256, "%*sVisibility: %u statue miles\n", ind, "", avr->rviz);
 	strncat(outstr, tempstr, 1024);
+
+
+
+/*
+           coverage = "Clear (0 Octs)";
+            coverage = "Few (1-2 Octs)";
+            coverage = "Scattered (3-4 Octs)";
+            coverage = "Broken (5-7 Octs)";
+            coverage = "Overcast (8 Octs)";
+*/
+
 
 	/* Return the new string */
 	return(outstr);
