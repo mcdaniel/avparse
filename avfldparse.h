@@ -13,6 +13,11 @@
 #include <time.h>
 #include <avparse.h>
 
+/* Defines */
+#define AVP_NO_GUST 0
+#define AVP_GUST 1
+
+
 /** Functional Prototypes **/
 
 /* Structure Processing Functions */
@@ -21,6 +26,8 @@ void release_avparser_struct( avparser_out *avp );
 avreading *allocate_avparser_reading( void );
 void release_avparser_reading( avreading *avr );
 time_t parse_zulu_time( char *tstr, avreading_time *avt );
+int parse_wind( char *tstr, avreading_wind *avw, int gust );
+int parse_visibility( char *tstr );
 
 /* Output / Debug Functions  */
 char * avreading_to_string( avreading *avr, int ind );

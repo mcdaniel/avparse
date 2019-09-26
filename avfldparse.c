@@ -179,6 +179,68 @@ time_t parse_zulu_time( char *tstr, avreading_time *avt ) {
 	return( avt->zulu );
 }
 
+/*/////////////////////////////////////////////////////////////////////////////
+//
+// Function     : parse_wind
+// Description  : parse the wind information from the metar reading
+//
+// Inputs       : tstr - the string containing the time data
+//              : avw - the wind structure to read from
+//              : gust - flag indicating gust information included
+// Outputs      : the current wind direction
+*/
+
+int parse_wind( char *tstr, avreading_wind *avw, int gust ) {
+
+	/* Local variables */
+	char tempstr[128];
+
+	/* Scan out the data */
+	if ( !gust ) {
+		if ( sscanf(tstr, "%3d%2dKT", &avw->direction, &avw->speed) != 2 ) {
+			snprintf(tempstr, 128, "Bad wind data in aviation data [%s]", tstr);
+			AVPARSE_FATAL_ERROR(tempstr);
+			exit(-1);
+		}
+		avw->gust = -1;
+	} else {
+		if ( sscanf(tstr, "%3d%2dG%2dKT", &avw->direction, &avw->speed, &avw->gust) != 3 ) {
+			snprintf(tempstr, 128, "Bad wind data in aviation data [%s]", tstr);
+			AVPARSE_FATAL_ERROR(tempstr);
+			exit(-1);
+		}
+	}
+
+	/* Return the wind speed */
+	return( avw->direction );
+}
+
+/*/////////////////////////////////////////////////////////////////////////////
+//
+// Function     : parse_visibility
+// Description  : parse the visibillity
+//
+// Inputs       : tstr - the string containing the time data
+// Outputs      : the visibility in statue miles
+*/
+
+int parse_visibility( char *tstr ) {
+
+	/* Local variables */
+	char tempstr[128];
+	int vis;
+
+	/* Scan out the data */
+	if ( sscanf(tstr, "%dSM", &vis) != 1 ) {
+		snprintf(tempstr, 128, "Bad visibility data in aviation data [%s]", tstr);
+		AVPARSE_FATAL_ERROR(tempstr);
+		exit(-1);
+	}
+
+	/* Return the visibility */
+	return( vis );
+}
+
 /****
 
 	Output / Debug Functions 
@@ -210,6 +272,14 @@ char * avreading_to_string( avreading *avr, int ind ) {
 	snprintf(tempstr, 256, "%*sZulu time: %s\n", ind, "", ctime(&avr->rtime.zulu));
 	strncat(outstr, tempstr, 1024);
 	snprintf(tempstr, 256, "%*sLocal time: %s\n", ind, "", ctime(&avr->rtime.local));
+	strncat(outstr, tempstr, 1024);
+	if (avr->rwind.gust != -1) {
+		snprintf(tempstr, 256, "%*sWind %d knots at %d, gusting %d knots\n", ind, "", avr->rwind.speed, avr->rwind.direction, avr->rwind.gust);
+	} else {
+		snprintf(tempstr, 256, "%*sWind %d knots at %d\n", ind, "", avr->rwind.speed, avr->rwind.direction);
+	}
+	strncat(outstr, tempstr, 1024);
+	snprintf(tempstr, 256, "%*sVisibility: %u statue miles\n", ind, "", avr->rviz);
 	strncat(outstr, tempstr, 1024);
 
 	/* Return the new string */

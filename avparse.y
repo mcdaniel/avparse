@@ -38,17 +38,18 @@ FILE *yyin;
 
 /* Declare all of the types of parsed values */
 %union {
-	int           intval;
-	char         *strval;
-	avreading    *parsed;
+	int             intval;
+	char           *strval;
+	avreading      *parsed;
+	avreading_wind *wndval;
 }
 
 /* Declare the tokens we will be using */
 %token <strval> AIRPORT
 %token <strval> ZULUTIME
-%token <strval> VISIBILITY
 %token <strval> WIND
 %token <strval> WINDGUST
+%token <strval> VISIBILITY
 %token <strval> COVERAGE
 %token <strval> TEMPERATURE
 %token <strval> ALTIMETER
@@ -56,6 +57,7 @@ FILE *yyin;
 %token <intval> UNKNOWN
 
 %type <parsed> avmetar_expression
+%type <wndval> wind
 
 %%
 
@@ -77,6 +79,9 @@ avmetar_expression:
 		}
 		$$->field = $1;
 		parse_zulu_time($2, &$$->rtime);
+		$$->rwind = *$3;
+		free($3);
+		$$->rviz = parse_visibility($4);
 		
 		printf( "Airport: [X %s]\n", $$->field ); /* free( $1 ); */
 	}
@@ -84,13 +89,14 @@ avmetar_expression:
 
 wind:
 	WIND {
-
-NOTE: what I need to do here is create wind structure, then pass it back, and copy on reception.
-
-		parse_wind($1, &$$->rwind);
+		$$ = malloc(sizeof(avreading_wind));
+		parse_wind($1, $$, AVP_NO_GUST);
 	}
 	|
-	WINDGUST
+	WINDGUST {
+		$$ = malloc(sizeof(avreading_wind));
+		parse_wind($1, $$, AVP_GUST);
+	}
 	;
 
 covexpr: COVERAGE

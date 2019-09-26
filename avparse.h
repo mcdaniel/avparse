@@ -37,6 +37,7 @@ typedef struct avr_struct {
 	char                      *field;  /* The airfield of the reading */
 	avreading_time             rtime;  /* The time of the reading */
 	avreading_wind             rwind;  /* THe wind reading */
+	unsigned int               rviz;   /* The visibility (in SM) */
 	struct avr_struct         *next;   /* The next item in the structure */
 } avreading;
 
