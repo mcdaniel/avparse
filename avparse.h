@@ -32,31 +32,32 @@ typedef struct avr_wind_struct {
 	int gust;      /* The wind gust, if applicable (-1 no gust) */
 } avreading_wind;
 
-/* Structure for a single reading */
-typedef struct avr_struct {
-	char                      *field;  /* The airfield of the reading */
-	avreading_time             rtime;  /* The time of the reading */
-	avreading_wind             rwind;  /* THe wind reading */
-	unsigned int               rviz;   /* The visibility (in SM) */
-	struct avr_struct         *next;   /* The next item in the structure */
-} avreading;
-
 /* Cloud coverage enumerated type */
-typedef enum avr_coverage_enum {
+typedef enum avreading_coverage_enum {
 	AVR_SKYCLEAR  = 0, /* 0 Octs */
 	AVR_FEW       = 1, /* 1-2 Octs */
 	AVR_SCATTERED = 2, /* 3-4 Octs */
 	AVR_BROKEN    = 3, /* 5-7 Octs */
 	AVR_OVERCAST  = 4, /* 8 Octs */
 	AVR_UNKNOWN   = 5  /* ????? */
-} avr_coverage_level;
+} avreading_coverage_level;
 
 /* Structure containing a coverage layer */
-typedef struct avr_coverage_struct {
-	avr_coverage_level    coverage;  /* Cloud layer coverage */
-	unsigned int          altitude;  /* Altitude of the coverage layer */
-	struct avr_coverage  *next;      /* Next layer in coverage report */
-} avr_coverage;
+typedef struct avreading_coverage_struct {
+	avreading_coverage_level           coverage;  /* Cloud layer coverage */
+	unsigned int                       altitude;  /* Altitude of the coverage layer */
+	struct avreading_coverage_struct  *next;      /* Next layer in coverage report */
+} avreading_coverage;
+
+/* Structure for a single reading */
+typedef struct avr_struct {
+	char                      *field;  /* The airfield of the reading */
+	avreading_time             rtime;  /* The time of the reading */
+	avreading_wind             rwind;  /* THe wind reading */
+	unsigned int               rviz;   /* The visibility (in SM) */
+	avreading_coverage        *rcvrg;  /* The list of cloud layers */
+	struct avr_struct         *next;   /* The next item in the structure */
+} avreading;
 
 /* Structure for holding all of the readings parsed */
 typedef struct av_readings {
@@ -64,6 +65,9 @@ typedef struct av_readings {
 	avreading  *readings;     /* The readings themeselves */
 	avreading  *tail;         /* The last reading in the list */
 } avparser_out;
+
+/* Static Helper Data */
+extern const char *avr_coverage_strings[]; /* List of cloud coverages */
 
 #define AVPARSE_INCLUDED
 #endif

@@ -38,10 +38,11 @@ FILE *yyin;
 
 /* Declare all of the types of parsed values */
 %union {
-	int             intval;
-	char           *strval;
-	avreading      *parsed;
-	avreading_wind *wndval;
+	int                 intval;
+	char               *strval;
+	avreading          *parsed;
+	avreading_wind     *wndval;
+	avreading_coverage *cvgval;
 }
 
 /* Declare the tokens we will be using */
@@ -58,6 +59,7 @@ FILE *yyin;
 
 %type <parsed> avmetar_expression
 %type <wndval> wind
+%type <cvgval> covexpr
 
 %%
 
@@ -82,6 +84,7 @@ avmetar_expression:
 		$$->rwind = *$3;
 		free($3);
 		$$->rviz = parse_visibility($4);
+		$$->rcvrg = $5;
 		
 		printf( "Airport: [X %s]\n", $$->field ); /* free( $1 ); */
 	}
@@ -99,8 +102,17 @@ wind:
 	}
 	;
 
-covexpr: COVERAGE
-	| covexpr COVERAGE
+covexpr: COVERAGE {
+		$$ = malloc(sizeof(avreading_coverage));
+		parse_coverage($1, $$);
+		$$->next = NULL;
+	}
+	| covexpr COVERAGE {
+		$$ = malloc(sizeof(avreading_coverage));
+		parse_coverage($2, $$);
+		$1->next = $$;
+		$$ = $1;
+	}
 	;
 
 %%

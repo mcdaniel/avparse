@@ -27,10 +27,10 @@ avreading *      allocate_avparser_reading( void );
 void             release_avparser_reading( avreading *avr );
 
 /* Parsing Functions */
-time_t           parse_zulu_time( char *tstr, avreading_time *avt );
-int              parse_wind( char *tstr, avreading_wind *avw, int gust );
-int              parse_visibility( char *tstr );
-avr_coverage *   parseCloudLayer( char *cstr );
+time_t                parse_zulu_time( char *tstr, avreading_time *avt );
+int                   parse_wind( char *tstr, avreading_wind *avw, int gust );
+int                   parse_visibility( char *tstr );
+avreading_coverage *  parse_coverage( char *cstr, avreading_coverage *coverage );
 
 /* Output / Debug Functions  */
 char *           avreading_to_string( avreading *avr, int ind );

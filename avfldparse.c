@@ -16,6 +16,13 @@
 
 /* Functions */
 
+/* Local data */
+
+/* List of cloud coverages */
+const char *avr_coverage_strings[] = { 
+	"Clear", "Few", "Scattered", "Broken", "Overcast", "Uknown"
+};
+
 /****
 
    Structure Processing Functions 
@@ -250,20 +257,21 @@ int parse_visibility( char *tstr ) {
 // Outputs      : pointer to coverage information
 */
 
-avr_coverage * parseCloudLayer( char *cstr ) {
+avreading_coverage * parse_coverage( char *cstr, avreading_coverage *coverage ) {
 
 	/* Local variables */
-	avr_coverage *coverage;
 	char cvg[4], tempstr[128];
 	int error = 0;
 
-	/* Allocate coverage information structure, scan data */
-	coverage = malloc(sizeof(avr_coverage));
+	/* Scan coverage information from data */
+
+/* TODO: need to check for SKC|CLR with no altitude */
+
     if ( sscanf(cstr, "%3s%3u", cvg, &coverage->altitude ) != 2 ) {
     	error = 1;
     } else {
 
-	    // Adjust altitude, process the coverage description
+	    /* Adjust altitude, process the coverage description */
 	    coverage->altitude *= 100;
 	    if ( strlen(cvg) != 3 ) {
 	    	error = 1;
@@ -290,7 +298,7 @@ avr_coverage * parseCloudLayer( char *cstr ) {
 		exit(-1);
     }
 
-    // Return the processed coverage 
+    /* Return the processed coverage */
     return( coverage );
 }
 
@@ -314,6 +322,7 @@ char * avreading_to_string( avreading *avr, int ind ) {
 
 	/* Local variables */
 	char *outstr, tempstr[256];
+	avreading_coverage *coverage;
 
 	/* Add the fields */
 	outstr = malloc(1024);
@@ -335,16 +344,19 @@ char * avreading_to_string( avreading *avr, int ind ) {
 	snprintf(tempstr, 256, "%*sVisibility: %u statue miles\n", ind, "", avr->rviz);
 	strncat(outstr, tempstr, 1024);
 
-
-
-/*
-           coverage = "Clear (0 Octs)";
-            coverage = "Few (1-2 Octs)";
-            coverage = "Scattered (3-4 Octs)";
-            coverage = "Broken (5-7 Octs)";
-            coverage = "Overcast (8 Octs)";
-*/
-
+	/* Now do the cloud layers */
+	coverage = avr->rcvrg;
+	while (coverage != NULL) {
+		if ((coverage->coverage < AVR_SKYCLEAR) || (coverage->coverage > AVR_OVERCAST)) {
+			snprintf(tempstr, 256, "%*sCloud layer %s at %d feet\n", ind, "", 
+				avr_coverage_strings[AVR_UNKNOWN], coverage->altitude);
+		} else {
+			snprintf(tempstr, 256, "%*sCloud layer %s at %d feet\n", ind, "", 
+				avr_coverage_strings[coverage->coverage], coverage->altitude);
+		}
+		strncat(outstr, tempstr, 1024);
+		coverage = coverage->next;
+	}
 
 	/* Return the new string */
 	return(outstr);
