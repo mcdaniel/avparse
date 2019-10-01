@@ -20,7 +20,7 @@
 
 /* List of cloud coverages */
 const char *avr_coverage_strings[] = { 
-	"Clear", "Few", "Scattered", "Broken", "Overcast", "Uknown"
+	"Sky clear", "Few", "Scattered", "Broken", "Overcast", "Uknown"
 };
 
 /****
@@ -264,12 +264,14 @@ avreading_coverage * parse_coverage( char *cstr, avreading_coverage *coverage ) 
 	int error = 0;
 
 	/* Scan coverage information from data */
-
-/* TODO: need to check for SKC|CLR with no altitude */
-
-    if ( sscanf(cstr, "%3s%3u", cvg, &coverage->altitude ) != 2 ) {
-    	error = 1;
+	if ( strlen(cstr) < 6 ) {
+  		error = (sscanf(cstr, "%3s", cvg) != 1) ;	
     } else {
+    	error = (sscanf(cstr, "%3s%3u", cvg, &coverage->altitude ) != 2);
+	}
+
+    /* If parsed correctly */
+    if ( ! error ) {
 
 	    /* Adjust altitude, process the coverage description */
 	    coverage->altitude *= 100;
@@ -277,6 +279,7 @@ avreading_coverage * parse_coverage( char *cstr, avreading_coverage *coverage ) 
 	    	error = 1;
 	    } else if ( (strncasecmp(cvg, "SKC", 3) == 0) || (strncasecmp(cvg, "CLR", 3) == 0) ) {
 	    	coverage->coverage = AVR_SKYCLEAR;
+	    	coverage->altitude = 0;
 	    } else if ( strncasecmp(cvg, "FEW", 3) == 0 ) {
 	    	coverage->coverage = AVR_FEW;
 	    } else if ( strncasecmp(cvg, "SCT", 3) == 0 ) {
@@ -351,8 +354,13 @@ char * avreading_to_string( avreading *avr, int ind ) {
 			snprintf(tempstr, 256, "%*sCloud layer %s at %d feet\n", ind, "", 
 				avr_coverage_strings[AVR_UNKNOWN], coverage->altitude);
 		} else {
-			snprintf(tempstr, 256, "%*sCloud layer %s at %d feet\n", ind, "", 
-				avr_coverage_strings[coverage->coverage], coverage->altitude);
+			if (coverage->coverage == AVR_SKYCLEAR) {
+				snprintf(tempstr, 256, "%*sCloud layer %s\n", ind, "", 
+					avr_coverage_strings[coverage->coverage]);
+			} else {
+				snprintf(tempstr, 256, "%*sCloud layer %s at %d feet\n", ind, "", 
+					avr_coverage_strings[coverage->coverage], coverage->altitude);
+			}
 		}
 		strncat(outstr, tempstr, 1024);
 		coverage = coverage->next;
