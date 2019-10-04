@@ -305,6 +305,46 @@ avreading_coverage * parse_coverage( char *cstr, avreading_coverage *coverage ) 
     return( coverage );
 }
 
+
+/*/////////////////////////////////////////////////////////////////////////////
+//
+// Function     : parse_temperature
+// Description  : parse the temperature and dewpoint, converto to F
+//
+// Inputs       : cstr - the string containing the coverage data
+//              : temp - the structure to put the temperature data into
+// Outputs      : pointer to coverage information
+*/
+
+int parse_temperature( char *cstr, avreading_temperature *temp ) {
+
+	/* Local variables */
+	char *ptr = cstr;
+
+	/* Read out the temperatiure value */
+	if ( ptr[0] == 'M' ) {
+		temp->temperature_celsisus = -((ptr[1] - '0')*10 + (ptr[2] - '0'));
+		ptr += 4;
+	} else {
+		temp->temperature_celsisus = (ptr[0] - '0')*10 + (ptr[1] - '0');
+		ptr += 3;
+	}
+
+	/* Read out the dew point value */
+	if ( ptr[0] == 'M' ) {
+		temp->dewpoint_celsisus = -((ptr[1] - '0')*10 + (ptr[2] - '0'));
+	} else {
+		temp->dewpoint_celsisus = (ptr[0] - '0')*10 + (ptr[1] - '0');
+	}
+
+	/* Formula for converstion C to F : (0°C × 9/5) + 32 = 32°F */
+	temp->temperature_fahrenheit = (temp->temperature_celsisus * 1.8) + 32;
+	temp->dewpoint_fahrenheit = (temp->dewpoint_celsisus * 1.8) + 32;
+
+	/* Return the current temperture */
+	return( temp->temperature_celsisus );
+}
+
 /****
 
 	Output / Debug Functions 
@@ -324,20 +364,28 @@ avreading_coverage * parse_coverage( char *cstr, avreading_coverage *coverage ) 
 char * avreading_to_string( avreading *avr, int ind ) {
 
 	/* Local variables */
-	char *outstr, tempstr[256];
+	char *outstr, tempstr[256], timestr[128];
+	struct tm * tm_info;
 	avreading_coverage *coverage;
 
-	/* Add the fields */
+	/* Add the field/time context */
 	outstr = malloc(1024);
 	memset(outstr, 0x0, 1024);
 	snprintf(tempstr, 256, "READING:\n");
 	strncat(outstr, tempstr, 1024);
 	snprintf(tempstr, 256, "%*sField: %s\n", ind, "", avr->field);
 	strncat(outstr, tempstr, 1024);
-	snprintf(tempstr, 256, "%*sZulu time: %s\n", ind, "", ctime(&avr->rtime.zulu));
+
+	/* Now do the time */
+    tm_info = localtime(&avr->rtime.zulu);
+    strftime(timestr, 256, "%r on %A, %B %d %Y", tm_info);
+	snprintf(tempstr, 256, "%*sZulu time: %s\n", ind, "", timestr);
 	strncat(outstr, tempstr, 1024);
-	snprintf(tempstr, 256, "%*sLocal time: %s\n", ind, "", ctime(&avr->rtime.local));
+    tm_info = localtime(&avr->rtime.local);
+    strftime(timestr, 256, "%r on %A, %B %d %Y", tm_info);
+	snprintf(tempstr, 256, "%*sLocal time: %s\n", ind, "", timestr);
 	strncat(outstr, tempstr, 1024);
+
 	if (avr->rwind.gust != -1) {
 		snprintf(tempstr, 256, "%*sWind %d knots at %d, gusting %d knots\n", ind, "", avr->rwind.speed, avr->rwind.direction, avr->rwind.gust);
 	} else {
@@ -365,6 +413,15 @@ char * avreading_to_string( avreading *avr, int ind ) {
 		strncat(outstr, tempstr, 1024);
 		coverage = coverage->next;
 	}
+
+	/* Temperature, Dewpoint */
+	snprintf(tempstr, 256, "%*sTemperature: %d Celsisus, %d, Fahrenheit\n", ind, "", 
+		avr->rtemp.temperature_celsisus, avr->rtemp.temperature_fahrenheit);
+	strncat(outstr, tempstr, 1024);
+	snprintf(tempstr, 256, "%*sDew point: %d Celsisus, %d, Fahrenheit\n", ind, "", 
+		avr->rtemp.dewpoint_celsisus, avr->rtemp.dewpoint_fahrenheit);
+	strncat(outstr, tempstr, 1024);
+
 
 	/* Return the new string */
 	return(outstr);

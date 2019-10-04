@@ -49,6 +49,14 @@ typedef struct avreading_coverage_struct {
 	struct avreading_coverage_struct  *next;      /* Next layer in coverage report */
 } avreading_coverage;
 
+/* Structure containing a coverage layer */
+typedef struct avreading_temperature_struct {
+	int	temperature_celsisus; 
+	int temperature_fahrenheit;
+	int dewpoint_celsisus;
+	int dewpoint_fahrenheit;
+} avreading_temperature;
+
 /* Structure for a single reading */
 typedef struct avr_struct {
 	char                      *field;  /* The airfield of the reading */
@@ -56,6 +64,7 @@ typedef struct avr_struct {
 	avreading_wind             rwind;  /* THe wind reading */
 	unsigned int               rviz;   /* The visibility (in SM) */
 	avreading_coverage        *rcvrg;  /* The list of cloud layers */
+	avreading_temperature      rtemp;  /* The temperature/dewpoint */
 	struct avr_struct         *next;   /* The next item in the structure */
 } avreading;
 

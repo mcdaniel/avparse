@@ -31,7 +31,7 @@ time_t                parse_zulu_time( char *tstr, avreading_time *avt );
 int                   parse_wind( char *tstr, avreading_wind *avw, int gust );
 int                   parse_visibility( char *tstr );
 avreading_coverage *  parse_coverage( char *cstr, avreading_coverage *coverage );
-
+int                   parse_temperature( char *cstr, avreading_temperature *temp );
 /* Output / Debug Functions  */
 char *           avreading_to_string( avreading *avr, int ind );
 void             print_parsed_input( avparser_out *avp );

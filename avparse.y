@@ -85,6 +85,7 @@ avmetar_expression:
 		free($3);
 		$$->rviz = parse_visibility($4);
 		$$->rcvrg = $5;
+		parse_temperature($6, &$$->rtemp);
 		
 		printf( "Airport: [X %s]\n", $$->field ); /* free( $1 ); */
 	}

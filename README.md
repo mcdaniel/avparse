@@ -17,4 +17,4 @@ TODO List
 	c) Add X/YSM visibility to parsing/processing
 	d) Add temperature to processing
 	e) Add altimeter setting to processing
-	f) Add conditions to setttings, e.g., -DZ, -SN, ...
+	f) Add conditions to setttings, e.g., -DZ, -SN, ... (page 11 of desu link above)
