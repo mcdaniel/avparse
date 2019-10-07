@@ -305,15 +305,14 @@ avreading_coverage * parse_coverage( char *cstr, avreading_coverage *coverage ) 
     return( coverage );
 }
 
-
 /*/////////////////////////////////////////////////////////////////////////////
 //
 // Function     : parse_temperature
 // Description  : parse the temperature and dewpoint, converto to F
 //
-// Inputs       : cstr - the string containing the coverage data
+// Inputs       : cstr - the string containing the temperature data
 //              : temp - the structure to put the temperature data into
-// Outputs      : pointer to coverage information
+// Outputs      : the temperature in celsisus
 */
 
 int parse_temperature( char *cstr, avreading_temperature *temp ) {
@@ -343,6 +342,33 @@ int parse_temperature( char *cstr, avreading_temperature *temp ) {
 
 	/* Return the current temperture */
 	return( temp->temperature_celsisus );
+}
+
+/*/////////////////////////////////////////////////////////////////////////////
+//
+// Function     : parse_altimeter
+// Description  : parse the altimeter, convert to inches of mercury
+//
+// Inputs       : astr - the string containing the altimeter data
+// Outputs      : the altimeter reading in inches of mercury
+*/
+
+float parse_altimeter( char *astr ) {
+
+
+	/* Local variables */
+	char tempstr[128];
+	int reading;
+
+	/* Parse out the altimeter data, return convered value */
+	if ( sscanf(astr, "A%d", &reading) != 1 ) {
+		snprintf(tempstr, 128, "Bad altimeter data in aviation data [%s]", astr);
+		AVPARSE_FATAL_ERROR(tempstr);
+		exit(-1);
+	}
+
+	/* Convert to inches of mercury */
+	return( (float)reading/100.0 );
 }
 
 /****
@@ -422,6 +448,9 @@ char * avreading_to_string( avreading *avr, int ind ) {
 		avr->rtemp.dewpoint_celsisus, avr->rtemp.dewpoint_fahrenheit);
 	strncat(outstr, tempstr, 1024);
 
+	snprintf(tempstr, 256, "%*sAltimeter setting: %4.2f\n", ind, "", avr->raltm);
+	strncat(outstr, tempstr, 1024);
+
 
 	/* Return the new string */
 	return(outstr);
@@ -439,7 +468,7 @@ char * avreading_to_string( avreading *avr, int ind ) {
 void print_parsed_input( avparser_out *avp ) {
 
 	/* Local variables */
-	char *outstr, *tstr, tempstr[256];
+	char *outstr, *tstr;
 	avreading *ptr;
 	int lineno = 0;
 
@@ -454,6 +483,7 @@ void print_parsed_input( avparser_out *avp ) {
 		strncat(outstr, tstr, 4096);
 		free(tstr);
 		ptr = ptr->next;
+		lineno ++;
 	}
 
 	printf( "%s", outstr );

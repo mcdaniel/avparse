@@ -12,9 +12,9 @@ https://business.desu.edu/sites/business/files/document/16/metar_and_taf_codes.p
 
 TODO List
 
-	a) Work on the time string
+	a) Work on the time string [completed]
 	b) Add correction [COR] - see example METAR
 	c) Add X/YSM visibility to parsing/processing
-	d) Add temperature to processing
+	d) Add temperature to processing  [completed]
 	e) Add altimeter setting to processing
 	f) Add conditions to setttings, e.g., -DZ, -SN, ... (page 11 of desu link above)

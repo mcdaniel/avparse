@@ -65,6 +65,7 @@ typedef struct avr_struct {
 	unsigned int               rviz;   /* The visibility (in SM) */
 	avreading_coverage        *rcvrg;  /* The list of cloud layers */
 	avreading_temperature      rtemp;  /* The temperature/dewpoint */
+	float                      raltm;  /* The altimeter reading */
 	struct avr_struct         *next;   /* The next item in the structure */
 } avreading;
 
