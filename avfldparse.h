@@ -17,7 +17,6 @@
 #define AVP_NO_GUST 0
 #define AVP_GUST 1
 
-
 /** Functional Prototypes **/
 
 /* Structure Processing Functions */

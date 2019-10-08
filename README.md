@@ -16,5 +16,5 @@ TODO List
 	b) Add correction [COR] - see example METAR
 	c) Add X/YSM visibility to parsing/processing
 	d) Add temperature to processing  [completed]
-	e) Add altimeter setting to processing
+	e) Add altimeter setting to processing [completed]
 	f) Add conditions to setttings, e.g., -DZ, -SN, ... (page 11 of desu link above)

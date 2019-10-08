@@ -23,6 +23,41 @@ const char *avr_coverage_strings[] = {
 	"Sky clear", "Few", "Scattered", "Broken", "Overcast", "Uknown"
 };
 
+/* List of weather conditions */
+const char *avr_condition_strings[AVR_CONDITION_MAX][2] = {
+    { "In the vicinity",          "VC" },
+    { "Patches",                  "BC" },
+    { "Blowing",                  "BL" },
+    { "Low drifting",             "DR" },
+    { "Freezing",                 "FZ" },
+    { "Shallow",                  "MI" },
+    { "Partial",                  "PR" },
+    { "Showers",                  "SH" },
+    { "Thunderstorm",             "TS" },
+    { "Drizzle",                  "DZ" },
+    { "Large hail",               "GR" },
+    { "Small hail, snow pellets", "GS" },
+    { "Ice crystals",             "IC" },
+    { "Ice pellets",              "PL" },
+    { "Rain",                     "RA" },
+    { "Snow grains",              "SG" },
+    { "Snow",                     "SN" },
+    { "Unknown percipitation",    "UP" },
+    { "Mist",                     "BR" },
+    { "Widespread dust",          "DU" },
+    { "Fog",                      "FG" },
+    { "Smoke",                    "FU" },
+    { "Haze",                     "HZ" },
+    { "Spray",                    "PY" },
+    { "Sand",                     "SA" },
+    { "Volcanic ash",             "VA" },
+    { "Dust storm",               "DS" },
+    { "Funnel cloud",             "FC" },
+    { "Dust/sand whirls",         "PO" },
+    { "Squalls",                  "SQ" },
+    { "Sand storm",               "SS" },
+};
+
 /****
 
    Structure Processing Functions 
@@ -448,7 +483,7 @@ char * avreading_to_string( avreading *avr, int ind ) {
 		avr->rtemp.dewpoint_celsisus, avr->rtemp.dewpoint_fahrenheit);
 	strncat(outstr, tempstr, 1024);
 
-	snprintf(tempstr, 256, "%*sAltimeter setting: %4.2f\n", ind, "", avr->raltm);
+	snprintf(tempstr, 256, "%*sAltimeter setting: %4.2f inches\n", ind, "", avr->raltm);
 	strncat(outstr, tempstr, 1024);
 
 

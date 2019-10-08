@@ -42,6 +42,54 @@ typedef enum avreading_coverage_enum {
 	AVR_UNKNOWN   = 5  /* ????? */
 } avreading_coverage_level;
 
+/* Weather conditions */
+typedef enum avreading_condition_enum {
+	/* Proximity conditions */
+	AVR_CONDITION_VC   = 0,  /* In the vicinity */
+
+	/* Condition desscription modifier */
+	AVR_CONDITION_BC   = 1,  /* Patches */
+	AVR_CONDITION_BL   = 2,  /* Blowing */
+	AVR_CONDITION_DR   = 3,  /* Low drifting */
+	AVR_CONDITION_FZ   = 4,  /* Freezing */
+	AVR_CONDITION_MI   = 5,  /* Shallow */
+	AVR_CONDITION_PR   = 6,  /* Partial */
+	AVR_CONDITION_SH   = 7,  /* Showers */
+	AVR_CONDITION_TS   = 8,  /* Thunderstorm */
+
+	/* Precipitation */
+	AVR_CONDITION_DZ   = 9,  /* Drizzle */
+	AVR_CONDITION_GR   = 10, /* Large hail */
+	AVR_CONDITION_GS   = 11, /* Small hail, snow pellets */
+	AVR_CONDITION_IC   = 12, /* Ice crystals */
+	AVR_CONDITION_PL   = 13, /* Ice pellets */
+	AVR_CONDITION_RA   = 14, /* Rain */
+	AVR_CONDITION_SG   = 15, /* Snow grains */
+	AVR_CONDITION_SN   = 16, /* Snow */
+	AVR_CONDITION_UP   = 17, /* Unknown percipitation */
+
+	/* Obsucration */
+	AVR_CONDITION_BR   = 18, /* Mist */
+	AVR_CONDITION_DU   = 19, /* Widespread dust */
+	AVR_CONDITION_FG   = 20, /* Fog */
+	AVR_CONDITION_FU   = 21, /* Smoke */
+	AVR_CONDITION_HZ   = 22, /* Haze */
+	AVR_CONDITION_PY   = 23, /* Spray */
+	AVR_CONDITION_SA   = 24, /* Sand */
+	AVR_CONDITION_VA   = 25, /* Volcanic ash */
+
+	/* Other */
+	AVR_CONDITION_DS   = 26, /* Dust storm */
+	AVR_CONDITION_FC   = 27, /* Funnel cloud */
+	AVR_CONDITION_PO   = 28, /* Dust/sand whirls */
+	AVR_CONDITION_SQ   = 29, /* Squalls */
+	AVR_CONDITION_SS   = 30, /* Sand storm */
+
+	AVR_CONDITION_MAX  = 31, /* Max condition type */
+
+} avreading_conditions;
+
+
 /* Structure containing a coverage layer */
 typedef struct avreading_coverage_struct {
 	avreading_coverage_level           coverage;  /* Cloud layer coverage */
@@ -78,6 +126,7 @@ typedef struct av_readings {
 
 /* Static Helper Data */
 extern const char *avr_coverage_strings[]; /* List of cloud coverages */
+extern const char *avr_condition_strings[][2]; /* List of weather conditions */
 
 #define AVPARSE_INCLUDED
 #endif
