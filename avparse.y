@@ -38,11 +38,12 @@ FILE *yyin;
 
 /* Declare all of the types of parsed values */
 %union {
-	int                 intval;
-	char               *strval;
-	avreading          *parsed;
-	avreading_wind     *wndval;
-	avreading_coverage *cvgval;
+	int                   intval;
+	char                 *strval;
+	avreading            *parsed;
+	avreading_wind       *wndval;
+	avreading_condition  *cndval;
+	avreading_coverage   *cvgval;
 }
 
 /* Declare the tokens we will be using */
@@ -51,6 +52,7 @@ FILE *yyin;
 %token <strval> WIND
 %token <strval> WINDGUST
 %token <strval> VISIBILITY
+%token <strval> CONDITION
 %token <strval> COVERAGE
 %token <strval> TEMPERATURE
 %token <strval> ALTIMETER
@@ -59,6 +61,7 @@ FILE *yyin;
 
 %type <parsed> avmetar_expression
 %type <wndval> wind
+%type <cndval> condexpr
 %type <cvgval> covexpr
 
 %%
@@ -69,7 +72,7 @@ avmetar:
 	;
 
 avmetar_expression:
-	AIRPORT ZULUTIME wind VISIBILITY covexpr TEMPERATURE ALTIMETER EOL {
+	AIRPORT ZULUTIME wind VISIBILITY condexpr covexpr TEMPERATURE ALTIMETER EOL {
 		$$ = allocate_avparser_reading();
 		if (avout->readings == NULL) {
 			avout->readings = avout->tail = $$;
@@ -85,8 +88,8 @@ avmetar_expression:
 		free($3);
 		$$->rviz = parse_visibility($4);
 		$$->rcvrg = $5;
-		parse_temperature($6, &$$->rtemp);
-		$$->raltm = parse_altimeter($7);
+		parse_temperature($7, &$$->rtemp);
+		$$->raltm = parse_altimeter($8);
 
 		printf( "Airport: [X %s]\n", $$->field ); /* free( $1 ); */
 	}
@@ -104,6 +107,19 @@ wind:
 	}
 	;
 
+condexpr: CONDITION {
+	    $$ = malloc(sizeof(avreading_condition));
+	    parse_condition($1, $$);
+	    $$->next = NULL;	
+    } 
+    |
+    condexpr CONDITION {
+	    $$ = malloc(sizeof(avreading_condition));
+	    parse_condition($1, $$);
+	    $$->next = $1;
+    }
+    ;
+
 covexpr: COVERAGE {
 		$$ = malloc(sizeof(avreading_coverage));
 		parse_coverage($1, $$);
@@ -116,6 +132,7 @@ covexpr: COVERAGE {
 		$$ = $1;
 	}
 	;
+
 
 %%
 

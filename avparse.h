@@ -13,11 +13,11 @@
 #include <stdio.h>
 #include <time.h>
 
-
 /** Macros **/
 #define AVPARSE_FATAL_ERROR(s) fprintf(stderr, "%s at %s, line %d aborting.\n", s, __FILE__, __LINE__);
 
 /** Definitions and Types **/
+#define AVR_MAX_CONDS 5
 
 /* Time structure for aviation reports */
 typedef struct avr_time_struct {
@@ -89,6 +89,12 @@ typedef enum avreading_condition_enum {
 
 } avreading_conditions;
 
+/* Weather condition intensity */
+typedef enum avreading_condition_intensity_enum {
+	AVR_CONDITION_ITENSITY_NON    = 0, /* No intensity information */
+	AVR_CONDITION_ITENSITY_LIGHT  = 1, /* Light intensity */
+	AVR_CONDITION_ITENSITY_HEAVY  = 2, /* Heavy intensity */
+} avreading_condition_intensity;
 
 /* Structure containing a coverage layer */
 typedef struct avreading_coverage_struct {
@@ -96,6 +102,13 @@ typedef struct avreading_coverage_struct {
 	unsigned int                       altitude;  /* Altitude of the coverage layer */
 	struct avreading_coverage_struct  *next;      /* Next layer in coverage report */
 } avreading_coverage;
+
+/* Structure containing the weather conditions information */
+typedef struct avreading_condition_struct {
+	avreading_conditions                conditions[AVR_MAX_CONDS];
+	avreading_condition_intensity       intensity;
+	struct avreading_condition_struct  *next;
+} avreading_condition;
 
 /* Structure containing a coverage layer */
 typedef struct avreading_temperature_struct {

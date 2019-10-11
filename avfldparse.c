@@ -340,6 +340,23 @@ avreading_coverage * parse_coverage( char *cstr, avreading_coverage *coverage ) 
     return( coverage );
 }
 
+
+/*/////////////////////////////////////////////////////////////////////////////
+//
+// Function     : parse_condition
+// Description  : parse the sky conditions textual data
+//
+// Inputs       : cstr - the string containing the coverage data
+//              : cond - pointer to the other conditions
+// Outputs      : pointer to conditions information
+*/
+
+avreading_condition * parse_condition( char *cstr, avreading_condition *cond ) {
+
+   /* Return the processed coverage */
+    return( cond );
+}
+
 /*/////////////////////////////////////////////////////////////////////////////
 //
 // Function     : parse_temperature
