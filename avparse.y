@@ -73,23 +73,30 @@ avmetar:
 
 avmetar_expression:
 	AIRPORT ZULUTIME wind VISIBILITY condexpr covexpr TEMPERATURE ALTIMETER EOL {
-		$$ = allocate_avparser_reading();
-		if (avout->readings == NULL) {
-			avout->readings = avout->tail = $$;
-			avout->no_readings = 1;
-		} else {
-			avout->tail->next = $$;
-			avout->tail = $$;
-			avout->no_readings ++;
-		}
+		$$ = allocate_avparser_reading(avout);
+		$$->field = $1;
+		parse_zulu_time($2, &$$->rtime);
+		$$->rwind = *$3;
+		free($3);
+		$$->rviz = parse_visibility($4);
+		/* Condition parsing */
+		$$->rcvrg = $6;
+		parse_temperature($7, &$$->rtemp);
+		$$->raltm = parse_altimeter($8);
+
+		printf( "Airport: [X %s]\n", $$->field ); /* free( $1 ); */
+	}
+	|
+	AIRPORT ZULUTIME wind VISIBILITY covexpr TEMPERATURE ALTIMETER EOL {
+		$$ = allocate_avparser_reading(avout);
 		$$->field = $1;
 		parse_zulu_time($2, &$$->rtime);
 		$$->rwind = *$3;
 		free($3);
 		$$->rviz = parse_visibility($4);
 		$$->rcvrg = $5;
-		parse_temperature($7, &$$->rtemp);
-		$$->raltm = parse_altimeter($8);
+		parse_temperature($6, &$$->rtemp);
+		$$->raltm = parse_altimeter($7);
 
 		printf( "Airport: [X %s]\n", $$->field ); /* free( $1 ); */
 	}
@@ -115,7 +122,7 @@ condexpr: CONDITION {
     |
     condexpr CONDITION {
 	    $$ = malloc(sizeof(avreading_condition));
-	    parse_condition($1, $$);
+	    parse_condition($2, $$);
 	    $$->next = $1;
     }
     ;

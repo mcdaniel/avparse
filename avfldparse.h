@@ -22,7 +22,7 @@
 /* Structure Processing Functions */
 avparser_out *   allocate_avparser_struct( void );
 void             release_avparser_struct( avparser_out *avp );
-avreading *      allocate_avparser_reading( void );
+avreading *      allocate_avparser_reading( avparser_out *avout );
 void             release_avparser_reading( avreading *avr );
 
 /* Parsing Functions */

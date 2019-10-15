@@ -121,23 +121,33 @@ void release_avparser_struct( avparser_out *avp ) {
 // Function     : allocate_avparser_reading
 // Description  : allocate/initialize the reading structure
 //
-// Inputs       : none
+// Inputs       : avout - parser output structure
 // Outputs      : a pointer to the new structure 
 */
 
-avreading *allocate_avparser_reading( void ) {
+avreading *allocate_avparser_reading( avparser_out *avout ) {
 
 	/* Local variables */
 	avreading *out;
 
-	/* Create structure if allocation successful */
+	/* Create structure if allocation successful, zero */
 	if ( (out = malloc(sizeof(avreading))) == NULL ) {
 		AVPARSE_FATAL_ERROR("Memory allocation failed");
 		exit(-1);
 	}
-
-	/* Clear and return the reading structure */
 	memset(out, 0x0, sizeof(avreading));
+
+	/* Place in avparser output stuct, as necessary */
+	if (avout->readings == NULL) {
+		avout->readings = avout->tail = out;
+		avout->no_readings = 1;
+	} else {
+		avout->tail->next = out;
+		avout->tail = out;
+		avout->no_readings ++;
+	}
+
+	/* Return the  weather reading structure */
 	return( out );
 }
 
