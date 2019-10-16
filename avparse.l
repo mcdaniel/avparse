@@ -26,6 +26,7 @@
 [0-9]{1,2}(SM|NM)                       { yylval.strval = strdup(yytext); return VISIBILITY; }
 [0-9]{3}[0-9]{2}KT                      { yylval.strval = strdup(yytext); return WIND; }
 [0-9]{3}[0-9]{2}G[0-9]{2}KT             { yylval.strval = strdup(yytext); return WINDGUST; }
+[-+]?(VC|BC|BL|DR|FZ|MI|PR|SH|TS|DZ|GR|GS|IC|PL|RA|SG|SN|UP|BR|DU|FG|FU|HZ|PY|SA|VA|DS|FC|PO|SQ|SS) { yylval.strval = strdup(yytext); return CONDITION; }
 (SKC|CLR)|((FEW|SCT|BKN|OVC)[0-9]{3})   { yylval.strval = strdup(yytext); return COVERAGE; }
 M?[0-9]{2}\/M?[0-9]{2}                  { yylval.strval = strdup(yytext); return TEMPERATURE; }
 A[0-9]{4}                               { yylval.strval = strdup(yytext); return ALTIMETER; }
@@ -40,3 +41,6 @@ A[0-9]{4}                               { yylval.strval = strdup(yytext); return
 Code is only needed when using lex parsing only 
 
 */
+
+
+
