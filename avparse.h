@@ -44,54 +44,58 @@ typedef enum avreading_coverage_enum {
 
 /* Weather conditions */
 typedef enum avreading_condition_enum {
+
+	/* Base (unknown) condition */
+	AVR_CONDITION_UN   = 0,  /* Condition is unknown */
+
 	/* Proximity conditions */
-	AVR_CONDITION_VC   = 0,  /* In the vicinity */
+	AVR_CONDITION_VC   = 1,  /* In the vicinity */
 
 	/* Condition desscription modifier */
-	AVR_CONDITION_BC   = 1,  /* Patches */
-	AVR_CONDITION_BL   = 2,  /* Blowing */
-	AVR_CONDITION_DR   = 3,  /* Low drifting */
-	AVR_CONDITION_FZ   = 4,  /* Freezing */
-	AVR_CONDITION_MI   = 5,  /* Shallow */
-	AVR_CONDITION_PR   = 6,  /* Partial */
-	AVR_CONDITION_SH   = 7,  /* Showers */
-	AVR_CONDITION_TS   = 8,  /* Thunderstorm */
+	AVR_CONDITION_BC   = 2,  /* Patches */
+	AVR_CONDITION_BL   = 3,  /* Blowing */
+	AVR_CONDITION_DR   = 4,  /* Low drifting */
+	AVR_CONDITION_FZ   = 5,  /* Freezing */
+	AVR_CONDITION_MI   = 6,  /* Shallow */
+	AVR_CONDITION_PR   = 7,  /* Partial */
+	AVR_CONDITION_SH   = 8,  /* Showers */
+	AVR_CONDITION_TS   = 9,  /* Thunderstorm */
 
 	/* Precipitation */
-	AVR_CONDITION_DZ   = 9,  /* Drizzle */
-	AVR_CONDITION_GR   = 10, /* Large hail */
-	AVR_CONDITION_GS   = 11, /* Small hail, snow pellets */
-	AVR_CONDITION_IC   = 12, /* Ice crystals */
-	AVR_CONDITION_PL   = 13, /* Ice pellets */
-	AVR_CONDITION_RA   = 14, /* Rain */
-	AVR_CONDITION_SG   = 15, /* Snow grains */
-	AVR_CONDITION_SN   = 16, /* Snow */
-	AVR_CONDITION_UP   = 17, /* Unknown percipitation */
+	AVR_CONDITION_DZ   = 10, /* Drizzle */
+	AVR_CONDITION_GR   = 11, /* Large hail */
+	AVR_CONDITION_GS   = 12, /* Small hail, snow pellets */
+	AVR_CONDITION_IC   = 13, /* Ice crystals */
+	AVR_CONDITION_PL   = 14, /* Ice pellets */
+	AVR_CONDITION_RA   = 15, /* Rain */
+	AVR_CONDITION_SG   = 16, /* Snow grains */
+	AVR_CONDITION_SN   = 17, /* Snow */
+	AVR_CONDITION_UP   = 18, /* Unknown percipitation */
 
 	/* Obsucration */
-	AVR_CONDITION_BR   = 18, /* Mist */
-	AVR_CONDITION_DU   = 19, /* Widespread dust */
-	AVR_CONDITION_FG   = 20, /* Fog */
-	AVR_CONDITION_FU   = 21, /* Smoke */
-	AVR_CONDITION_HZ   = 22, /* Haze */
-	AVR_CONDITION_PY   = 23, /* Spray */
-	AVR_CONDITION_SA   = 24, /* Sand */
-	AVR_CONDITION_VA   = 25, /* Volcanic ash */
+	AVR_CONDITION_BR   = 19, /* Mist */
+	AVR_CONDITION_DU   = 20, /* Widespread dust */
+	AVR_CONDITION_FG   = 21, /* Fog */
+	AVR_CONDITION_FU   = 22, /* Smoke */
+	AVR_CONDITION_HZ   = 23, /* Haze */
+	AVR_CONDITION_PY   = 24, /* Spray */
+	AVR_CONDITION_SA   = 25, /* Sand */
+	AVR_CONDITION_VA   = 26, /* Volcanic ash */
 
 	/* Other */
-	AVR_CONDITION_DS   = 26, /* Dust storm */
-	AVR_CONDITION_FC   = 27, /* Funnel cloud */
-	AVR_CONDITION_PO   = 28, /* Dust/sand whirls */
-	AVR_CONDITION_SQ   = 29, /* Squalls */
-	AVR_CONDITION_SS   = 30, /* Sand storm */
+	AVR_CONDITION_DS   = 27, /* Dust storm */
+	AVR_CONDITION_FC   = 28, /* Funnel cloud */
+	AVR_CONDITION_PO   = 29, /* Dust/sand whirls */
+	AVR_CONDITION_SQ   = 30, /* Squalls */
+	AVR_CONDITION_SS   = 31, /* Sand storm */
 
-	AVR_CONDITION_MAX  = 31, /* Max condition type */
+	AVR_CONDITION_MAX  = 32, /* Max condition type */
 
 } avreading_conditions;
 
 /* Weather condition intensity */
 typedef enum avreading_condition_intensity_enum {
-	AVR_CONDITION_ITENSITY_NON    = 0, /* No intensity information */
+	AVR_CONDITION_ITENSITY_NONE   = 0, /* No intensity information */
 	AVR_CONDITION_ITENSITY_LIGHT  = 1, /* Light intensity */
 	AVR_CONDITION_ITENSITY_HEAVY  = 2, /* Heavy intensity */
 } avreading_condition_intensity;
@@ -124,6 +128,7 @@ typedef struct avr_struct {
 	avreading_time             rtime;  /* The time of the reading */
 	avreading_wind             rwind;  /* THe wind reading */
 	unsigned int               rviz;   /* The visibility (in SM) */
+	avreading_conditions      *rcond;  /* The list of WX conditions */
 	avreading_coverage        *rcvrg;  /* The list of cloud layers */
 	avreading_temperature      rtemp;  /* The temperature/dewpoint */
 	float                      raltm;  /* The altimeter reading */

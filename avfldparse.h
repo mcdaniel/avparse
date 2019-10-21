@@ -30,7 +30,7 @@ time_t                parse_zulu_time( char *tstr, avreading_time *avt );
 int                   parse_wind( char *tstr, avreading_wind *avw, int gust );
 int                   parse_visibility( char *tstr );
 avreading_coverage *  parse_coverage( char *cstr, avreading_coverage *coverage );
-avreading_condition * parse_condition( char *cstr, avreading_condition *cond );
+avreading_condition * parse_conditions( char *cstr, avreading_condition *conds );
 int                   parse_temperature( char *cstr, avreading_temperature *temp );
 float                 parse_altimeter( char *astr );
 

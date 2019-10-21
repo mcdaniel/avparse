@@ -18,3 +18,4 @@ TODO List
 	d) Add temperature to processing  [completed]
 	e) Add altimeter setting to processing [completed]
 	f) Add conditions to setttings, e.g., -DZ, -SN, ... (page 11 of desu link above)
+	g) The conditions and coverage lists reorder anything longer than 2 elemetns (need to change this to add new elements onto tail)

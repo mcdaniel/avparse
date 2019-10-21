@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <ctype.h>
 #include <avfldparse.h>
 
 /* Functions */
@@ -25,6 +26,7 @@ const char *avr_coverage_strings[] = {
 
 /* List of weather conditions */
 const char *avr_condition_strings[AVR_CONDITION_MAX][2] = {
+	{ "Condition is unknown",     "??" },
     { "In the vicinity",          "VC" },
     { "Patches",                  "BC" },
     { "Blowing",                  "BL" },
@@ -295,6 +297,85 @@ int parse_visibility( char *tstr ) {
 
 /*/////////////////////////////////////////////////////////////////////////////
 //
+// Function     : parse_conditions
+// Description  : parse the weather conditions information from a textual data
+//
+// Inputs       : cstr - the string containing the condition data
+// Outputs      : pointer to coverage information
+*/
+
+avreading_condition * parse_conditions( char *cstr, avreading_condition *conds ) {
+
+	/* Local variables */
+	char condstr[3] = { 0x0, 0x0, 0x0 }, tempstr[128];
+	int idx = 0, cindex = 0, condnum;
+
+	/* Zero structure */
+	memset( conds, 0x0, sizeof(avreading_coverage) );
+
+	/* Read the possible intesity */
+	if ( cstr[idx] == '+' ) {
+		conds->intensity = AVR_CONDITION_ITENSITY_HEAVY;
+		idx ++;
+	} else if ( cstr[idx] == '-' ) {
+		conds->intensity = AVR_CONDITION_ITENSITY_LIGHT;
+		idx ++;
+	}
+
+	/* Keep walking the entire string */
+	while ( (cindex < AVR_MAX_CONDS) && (cstr[idx] != 0x0) ) {
+
+		/* Sanity check the rest of the string */
+		if ( strlen(&cstr[idx]) < 2 ) {
+			snprintf(tempstr, 128, "Bad condition data in aviation data [%s]", cstr);
+			AVPARSE_FATAL_ERROR(tempstr);
+			exit(-1);			
+		}
+
+		/* Setup the string, search conditions */
+		condstr[0] = toupper(cstr[idx]);
+		idx ++;
+		condstr[1] = toupper(cstr[idx]); 
+		idx ++;
+
+		/* Walk all of the known conditions and check to see if it looks good */
+		condnum = AVR_CONDITION_VC;
+		while ( (conds->conditions[cindex] == AVR_CONDITION_UN) && 
+				(condnum < AVR_CONDITION_MAX) ) {
+
+			/* Is this the correct condition */
+			if ( strncmp(condstr, avr_condition_strings[condnum][1], 2) == 0 ) {
+				conds->conditions[cindex] = condnum;
+			} else {
+				condnum ++;
+			}
+
+		}
+
+		/* We did not find the condition */
+		if ( conds->conditions[cindex] == AVR_CONDITION_UN ) {
+			snprintf(tempstr, 128, "Bad condition type in aviation data [%s][%2s]", cstr, condstr);
+			AVPARSE_FATAL_ERROR(tempstr);
+			exit(-1);	
+		}
+
+		/* Move to the next condition */
+		cindex ++;
+	}
+
+	/* Check to make sure we have exhausted the conditions */
+	if ( cstr[idx] != 0x0 ) {
+		snprintf(tempstr, 128, "Too many conditions in aviation data [%s]", cstr);
+		AVPARSE_FATAL_ERROR(tempstr);
+		exit(-1);	
+	}
+
+	/* Now return the conditions */
+	return( conds );
+}
+
+/*/////////////////////////////////////////////////////////////////////////////
+//
 // Function     : parse_coverage
 // Description  : parse the coverage information from a textual data
 //
@@ -348,23 +429,6 @@ avreading_coverage * parse_coverage( char *cstr, avreading_coverage *coverage ) 
 
     /* Return the processed coverage */
     return( coverage );
-}
-
-
-/*/////////////////////////////////////////////////////////////////////////////
-//
-// Function     : parse_condition
-// Description  : parse the sky conditions textual data
-//
-// Inputs       : cstr - the string containing the coverage data
-//              : cond - pointer to the other conditions
-// Outputs      : pointer to conditions information
-*/
-
-avreading_condition * parse_condition( char *cstr, avreading_condition *cond ) {
-
-   /* Return the processed coverage */
-    return( cond );
 }
 
 /*/////////////////////////////////////////////////////////////////////////////
@@ -516,6 +580,23 @@ char * avreading_to_string( avreading *avr, int ind ) {
 
 	/* Return the new string */
 	return(outstr);
+}
+
+/*/////////////////////////////////////////////////////////////////////////////
+//
+// Function     : print_parsed_input
+// Description  : do a simple output of the parser output
+//
+// Inputs       : avp - pointer to the avparser output
+// Outputs      : a pointer to the new structure 
+*/
+
+char * avreading_condition_to_string( avreading_condition *cond, char *str, size_t len ) {
+
+	/* Local variables */
+
+	
+
 }
 
 /*/////////////////////////////////////////////////////////////////////////////

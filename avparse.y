@@ -79,7 +79,7 @@ avmetar_expression:
 		$$->rwind = *$3;
 		free($3);
 		$$->rviz = parse_visibility($4);
-		/* Condition parsing */
+		$$->rcond = $5;
 		$$->rcvrg = $6;
 		parse_temperature($7, &$$->rtemp);
 		$$->raltm = parse_altimeter($8);
@@ -94,6 +94,7 @@ avmetar_expression:
 		$$->rwind = *$3;
 		free($3);
 		$$->rviz = parse_visibility($4);
+		$$->rcond = NULL;
 		$$->rcvrg = $5;
 		parse_temperature($6, &$$->rtemp);
 		$$->raltm = parse_altimeter($7);
@@ -116,14 +117,15 @@ wind:
 
 condexpr: CONDITION {
 	    $$ = malloc(sizeof(avreading_condition));
-	    parse_condition($1, $$);
-	    $$->next = NULL;	
+	    parse_conditions($1, $$);
+	    $$->next = NULL;
     } 
     |
     condexpr CONDITION {
 	    $$ = malloc(sizeof(avreading_condition));
-	    parse_condition($2, $$);
-	    $$->next = $1;
+	    parse_conditions($2, $$);
+	    $1->next = $$;
+	    $$ = $1;
     }
     ;
 
