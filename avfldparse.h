@@ -36,6 +36,7 @@ float                 parse_altimeter( char *astr );
 
 /* Output / Debug Functions  */
 char *           avreading_to_string( avreading *avr, int ind );
+char *           avreading_condition_to_string( avreading_condition *cond, char *str, size_t len );
 void             print_parsed_input( avparser_out *avp );
 
 #define AVFLDPARSE_INCLUDED

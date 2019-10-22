@@ -518,6 +518,7 @@ char * avreading_to_string( avreading *avr, int ind ) {
 	/* Local variables */
 	char *outstr, tempstr[256], timestr[128];
 	struct tm * tm_info;
+	avreading_condition *condptr;
 	avreading_coverage *coverage;
 
 	/* Add the field/time context */
@@ -546,6 +547,15 @@ char * avreading_to_string( avreading *avr, int ind ) {
 	strncat(outstr, tempstr, 1024);
 	snprintf(tempstr, 256, "%*sVisibility: %u statue miles\n", ind, "", avr->rviz);
 	strncat(outstr, tempstr, 1024);
+
+	/* Process the weather conditions */
+	condptr = avr->rcond;
+	while ( condptr != NULL ) {
+		avreading_condition_to_string( condptr, tempstr, 256 );
+		strncat(outstr, tempstr, 1024);
+		condptr = condptr->next;
+	}
+ 
 
 	/* Now do the cloud layers */
 	coverage = avr->rcvrg;
@@ -584,19 +594,58 @@ char * avreading_to_string( avreading *avr, int ind ) {
 
 /*/////////////////////////////////////////////////////////////////////////////
 //
-// Function     : print_parsed_input
-// Description  : do a simple output of the parser output
+// Function     : avreading_condition_to_string
+// Description  : convert a single condition reading to string
 //
-// Inputs       : avp - pointer to the avparser output
-// Outputs      : a pointer to the new structure 
+// Inputs       : cond - the condition to convert
+//                str - the string to place the text into
+//                len - the length of the string
+// Outputs      : a pointer to the conversion string
 */
 
 char * avreading_condition_to_string( avreading_condition *cond, char *str, size_t len ) {
 
 	/* Local variables */
+	char tempstr[128];
+	int condidx;
 
-	
+	/* Process the intensity of the condition, if there is one */
+	if ( cond->intensity > AVR_CONDITION_ITENSITY_NONE ) {
+		if ( cond->intensity == AVR_CONDITION_ITENSITY_LIGHT ) {
+			strncpy(str, "Light ", len);
+		} else if ( cond->intensity == AVR_CONDITION_ITENSITY_HEAVY ) {
+			strncpy(str, "Heavy ", len);
+		} else {
+			/* Unknown intensity level, error out */
+			snprintf(tempstr, 128, "Bad intensity value in parsed aviation data [%d]", cond->intensity);
+			AVPARSE_FATAL_ERROR(tempstr);
+			exit(-1);			
+		}
+	}
 
+	/* Now add the conditions */
+	condidx = 0;
+	while ( cond->conditions[condidx] != AVR_CONDITION_UN ) {
+
+		/* Check for errored condition */
+		if ( cond->conditions[condidx] >= AVR_CONDITION_MAX ) {
+			/* Unknown intensity level, error out */
+			snprintf(tempstr, 128, "Bad condition value in parsed aviation data [%d]", cond->conditions[condidx]);
+			AVPARSE_FATAL_ERROR(tempstr);
+			exit(-1);					
+		}
+
+		/* Now add the condition, move to next */
+		if ( condidx > 0 ) {
+			strncat(str, ", ", len);
+		}
+		strncat(str, avr_condition_strings[cond->conditions[condidx]][0], len);
+		condidx ++;
+	}
+
+	/* EOL, return the string */
+	strncat(str, ", ", len);
+	return( str );
 }
 
 /*/////////////////////////////////////////////////////////////////////////////

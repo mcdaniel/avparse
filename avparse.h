@@ -100,19 +100,19 @@ typedef enum avreading_condition_intensity_enum {
 	AVR_CONDITION_ITENSITY_HEAVY  = 2, /* Heavy intensity */
 } avreading_condition_intensity;
 
-/* Structure containing a coverage layer */
-typedef struct avreading_coverage_struct {
-	avreading_coverage_level           coverage;  /* Cloud layer coverage */
-	unsigned int                       altitude;  /* Altitude of the coverage layer */
-	struct avreading_coverage_struct  *next;      /* Next layer in coverage report */
-} avreading_coverage;
-
 /* Structure containing the weather conditions information */
 typedef struct avreading_condition_struct {
 	avreading_conditions                conditions[AVR_MAX_CONDS];
 	avreading_condition_intensity       intensity;
 	struct avreading_condition_struct  *next;
 } avreading_condition;
+
+/* Structure containing a coverage layer */
+typedef struct avreading_coverage_struct {
+	avreading_coverage_level           coverage;  /* Cloud layer coverage */
+	unsigned int                       altitude;  /* Altitude of the coverage layer */
+	struct avreading_coverage_struct  *next;      /* Next layer in coverage report */
+} avreading_coverage;
 
 /* Structure containing a coverage layer */
 typedef struct avreading_temperature_struct {
@@ -128,7 +128,7 @@ typedef struct avr_struct {
 	avreading_time             rtime;  /* The time of the reading */
 	avreading_wind             rwind;  /* THe wind reading */
 	unsigned int               rviz;   /* The visibility (in SM) */
-	avreading_conditions      *rcond;  /* The list of WX conditions */
+	avreading_condition       *rcond;  /* The list of WX conditions */
 	avreading_coverage        *rcvrg;  /* The list of cloud layers */
 	avreading_temperature      rtemp;  /* The temperature/dewpoint */
 	float                      raltm;  /* The altimeter reading */
