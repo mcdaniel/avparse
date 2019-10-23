@@ -49,6 +49,7 @@ FILE *yyin;
 /* Declare the tokens we will be using */
 %token <strval> AIRPORT
 %token <strval> ZULUTIME
+%token <strval> CORRECTION
 %token <strval> WIND
 %token <strval> WINDGUST
 %token <strval> VISIBILITY
@@ -60,6 +61,7 @@ FILE *yyin;
 %token <intval> UNKNOWN
 
 %type <parsed> avmetar_expression
+%type <parsed> preamble
 %type <wndval> wind
 %type <cndval> condexpr
 %type <cvgval> covexpr
@@ -72,32 +74,43 @@ avmetar:
 	;
 
 avmetar_expression:
-	AIRPORT ZULUTIME wind VISIBILITY condexpr covexpr TEMPERATURE ALTIMETER EOL {
-		$$ = allocate_avparser_reading(avout);
-		$$->field = $1;
-		parse_zulu_time($2, &$$->rtime);
-		$$->rwind = *$3;
-		free($3);
-		$$->rviz = parse_visibility($4);
-		$$->rcond = $5;
-		$$->rcvrg = $6;
-		parse_temperature($7, &$$->rtemp);
-		$$->raltm = parse_altimeter($8);
-	}
-	|
-	AIRPORT ZULUTIME wind VISIBILITY covexpr TEMPERATURE ALTIMETER EOL {
-		$$ = allocate_avparser_reading(avout);
-		$$->field = $1;
-		parse_zulu_time($2, &$$->rtime);
-		$$->rwind = *$3;
-		free($3);
-		$$->rviz = parse_visibility($4);
-		$$->rcond = NULL;
+	preamble wind VISIBILITY condexpr covexpr TEMPERATURE ALTIMETER EOL {
+		$$ = $1;
+		$$->rwind = *$2;
+		free($2);
+		$$->rviz = parse_visibility($3);
+		$$->rcond = $4;
 		$$->rcvrg = $5;
 		parse_temperature($6, &$$->rtemp);
 		$$->raltm = parse_altimeter($7);
 	}
+	|
+	preamble wind VISIBILITY covexpr TEMPERATURE ALTIMETER EOL {
+		$$ = $1;
+		$$->rwind = *$2;
+		free($2);
+		$$->rviz = parse_visibility($3);
+		$$->rcond = NULL;
+		$$->rcvrg = $4;
+		parse_temperature($5, &$$->rtemp);
+		$$->raltm = parse_altimeter($6);
+	}
 	;
+
+preamble:
+	AIRPORT ZULUTIME { 
+		$$ = allocate_avparser_reading(avout);
+		$$->field = $1;
+		parse_zulu_time($2, &$$->rtime);
+		$$->rcorr = 0; 
+	}
+	|
+	AIRPORT ZULUTIME CORRECTION {
+		$$ = allocate_avparser_reading(avout);
+		$$->field = $1;
+		parse_zulu_time($2, &$$->rtime);
+		$$->rcorr = 1;
+	}
 
 wind:
 	WIND {
@@ -113,12 +126,13 @@ wind:
 
 condexpr: CONDITION {
 	    $$ = malloc(sizeof(avreading_condition));
-	    parse_conditions($1, $$);
 	    $$->next = NULL;
+	    parse_conditions($1, $$);
     } 
     |
     condexpr CONDITION {
 	    $$ = malloc(sizeof(avreading_condition));
+	    $$->next = NULL;
 	    parse_conditions($2, $$);
 	    $1->next = $$;
 	    $$ = $1;

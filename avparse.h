@@ -126,6 +126,7 @@ typedef struct avreading_temperature_struct {
 typedef struct avr_struct {
 	char                      *field;  /* The airfield of the reading */
 	avreading_time             rtime;  /* The time of the reading */
+	unsigned int               rcorr;  /* Is this a corrected report */
 	avreading_wind             rwind;  /* THe wind reading */
 	unsigned int               rviz;   /* The visibility (in SM) */
 	avreading_condition       *rcond;  /* The list of WX conditions */
