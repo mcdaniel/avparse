@@ -481,7 +481,6 @@ int parse_temperature( char *cstr, avreading_temperature *temp ) {
 
 float parse_altimeter( char *astr ) {
 
-
 	/* Local variables */
 	char tempstr[128];
 	int reading;
@@ -551,12 +550,11 @@ char * avreading_to_string( avreading *avr, int ind ) {
 	/* Process the weather conditions */
 	condptr = avr->rcond;
 	while ( condptr != NULL ) {
-		avreading_condition_to_string( condptr, tempstr, 256 );
+		avreading_condition_to_string(condptr, tempstr, 256);
 		strncat(outstr, tempstr, 1024);
 		condptr = condptr->next;
 	}
  
-
 	/* Now do the cloud layers */
 	coverage = avr->rcvrg;
 	while (coverage != NULL) {

@@ -83,8 +83,6 @@ avmetar_expression:
 		$$->rcvrg = $6;
 		parse_temperature($7, &$$->rtemp);
 		$$->raltm = parse_altimeter($8);
-
-		printf( "Airport: [X %s]\n", $$->field ); /* free( $1 ); */
 	}
 	|
 	AIRPORT ZULUTIME wind VISIBILITY covexpr TEMPERATURE ALTIMETER EOL {
@@ -98,8 +96,6 @@ avmetar_expression:
 		$$->rcvrg = $5;
 		parse_temperature($6, &$$->rtemp);
 		$$->raltm = parse_altimeter($7);
-
-		printf( "Airport: [X %s]\n", $$->field ); /* free( $1 ); */
 	}
 	;
 
