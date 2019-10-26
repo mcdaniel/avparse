@@ -20,10 +20,10 @@
 /** Functional Prototypes **/
 
 /* Structure Processing Functions */
-avparser_out *   allocate_avparser_struct( void );
-void             release_avparser_struct( avparser_out *avp );
-avreading *      allocate_avparser_reading( avparser_out *avout );
-void             release_avparser_reading( avreading *avr );
+avparser_out *        allocate_avparser_struct( void );
+void                  release_avparser_struct( avparser_out *avp );
+avreading *           allocate_avparser_reading( avparser_out *avout );
+void                  release_avparser_reading( avreading *avr );
 
 /* Parsing Functions */
 time_t                parse_zulu_time( char *tstr, avreading_time *avt );
@@ -35,9 +35,14 @@ int                   parse_temperature( char *cstr, avreading_temperature *temp
 float                 parse_altimeter( char *astr );
 
 /* Output / Debug Functions  */
-char *           avreading_to_string( avreading *avr, int ind );
-char *           avreading_condition_to_string( avreading_condition *cond, char *str, size_t len );
-void             print_parsed_input( avparser_out *avp );
+char *                avreading_to_string( avreading *avr, int ind );
+char *                avreading_condition_to_string( avreading_condition *cond, char *str, size_t len );
+void                  print_parsed_input( avparser_out *avp );
+
+
+/* Utility Functions */
+size_t                safe_strlcat(char * dst, const char * src, size_t dstsize);
+
 
 #define AVFLDPARSE_INCLUDED
 #endif

@@ -141,11 +141,12 @@ condexpr: CONDITION {
 
 covexpr: COVERAGE {
 		$$ = malloc(sizeof(avreading_coverage));
-		parse_coverage($1, $$);
 		$$->next = NULL;
+		parse_coverage($1, $$);
 	}
 	| covexpr COVERAGE {
 		$$ = malloc(sizeof(avreading_coverage));
+		$$->next = NULL;
 		parse_coverage($2, $$);
 		$1->next = $$;
 		$$ = $1;

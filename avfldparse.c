@@ -208,6 +208,7 @@ time_t parse_zulu_time( char *tstr, avreading_time *avt ) {
 	printf( "The local offset is %ld [%s], zulu time = %s\n.", ltime->tm_gmtoff, ltime->tm_zone, tstr );
 
 	/* Setup time to adjust */
+	memset(&adjtime, 0x0, sizeof(adjtime));
 	adjtime.tm_sec = 0;
 	adjtime.tm_min = mn;
 	adjtime.tm_hour = hr;
@@ -515,7 +516,7 @@ float parse_altimeter( char *astr ) {
 char * avreading_to_string( avreading *avr, int ind ) {
 
 	/* Local variables */
-	char *outstr, tempstr[256], timestr[128];
+	char *outstr, tempstr[257], timestr[129];
 	struct tm * tm_info;
 	avreading_condition *condptr;
 	avreading_coverage *coverage;
@@ -524,34 +525,34 @@ char * avreading_to_string( avreading *avr, int ind ) {
 	outstr = malloc(1024);
 	memset(outstr, 0x0, 1024);
 	snprintf(tempstr, 256, "READING:\n");
-	strncat(outstr, tempstr, 1024);
+	safe_strlcat(outstr, tempstr, 1024);
 	snprintf(tempstr, 256, "%*sField: %s\n", ind, "", avr->field);
-	strncat(outstr, tempstr, 1024);
+	safe_strlcat(outstr, tempstr, 1024);
 
 	/* Now do the time */
     tm_info = localtime(&avr->rtime.zulu);
     strftime(timestr, 256, "%r on %A, %B %d %Y", tm_info);
 	snprintf(tempstr, 256, "%*sZulu time: %s\n", ind, "", timestr);
-	strncat(outstr, tempstr, 1024);
+	safe_strlcat(outstr, tempstr, 1024);
     tm_info = localtime(&avr->rtime.local);
     strftime(timestr, 256, "%r on %A, %B %d %Y", tm_info);
 	snprintf(tempstr, 256, "%*sLocal time: %s\n", ind, "", timestr);
-	strncat(outstr, tempstr, 1024);
+	safe_strlcat(outstr, tempstr, 1024);
 
 	if (avr->rwind.gust != -1) {
 		snprintf(tempstr, 256, "%*sWind %d knots at %d, gusting %d knots\n", ind, "", avr->rwind.speed, avr->rwind.direction, avr->rwind.gust);
 	} else {
 		snprintf(tempstr, 256, "%*sWind %d knots at %d\n", ind, "", avr->rwind.speed, avr->rwind.direction);
 	}
-	strncat(outstr, tempstr, 1024);
+	safe_strlcat(outstr, tempstr, 1024);
 	snprintf(tempstr, 256, "%*sVisibility: %u statue miles\n", ind, "", avr->rviz);
-	strncat(outstr, tempstr, 1024);
+	safe_strlcat(outstr, tempstr, 1024);
 
 	/* Process the weather conditions */
 	condptr = avr->rcond;
 	while ( condptr != NULL ) {
 		avreading_condition_to_string(condptr, tempstr, 256);
-		strncat(outstr, tempstr, 1024);
+		safe_strlcat(outstr, tempstr, 1024);
 		condptr = condptr->next;
 	}
  
@@ -570,21 +571,20 @@ char * avreading_to_string( avreading *avr, int ind ) {
 					avr_coverage_strings[coverage->coverage], coverage->altitude);
 			}
 		}
-		strncat(outstr, tempstr, 1024);
+		safe_strlcat(outstr, tempstr, 1024);
 		coverage = coverage->next;
 	}
 
 	/* Temperature, Dewpoint */
 	snprintf(tempstr, 256, "%*sTemperature: %d Celsisus, %d, Fahrenheit\n", ind, "", 
 		avr->rtemp.temperature_celsisus, avr->rtemp.temperature_fahrenheit);
-	strncat(outstr, tempstr, 1024);
+	safe_strlcat(outstr, tempstr, 1024);
 	snprintf(tempstr, 256, "%*sDew point: %d Celsisus, %d, Fahrenheit\n", ind, "", 
 		avr->rtemp.dewpoint_celsisus, avr->rtemp.dewpoint_fahrenheit);
-	strncat(outstr, tempstr, 1024);
+	safe_strlcat(outstr, tempstr, 1024);
 
 	snprintf(tempstr, 256, "%*sAltimeter setting: %4.2f inches\n", ind, "", avr->raltm);
-	strncat(outstr, tempstr, 1024);
-
+	safe_strlcat(outstr, tempstr, 1024);
 
 	/* Return the new string */
 	return(outstr);
@@ -635,14 +635,14 @@ char * avreading_condition_to_string( avreading_condition *cond, char *str, size
 
 		/* Now add the condition, move to next */
 		if ( condidx > 0 ) {
-			strncat(str, ", ", len);
+			safe_strlcat(str, ", ", len-1);
 		}
-		strncat(str, avr_condition_strings[cond->conditions[condidx]][0], len);
+		safe_strlcat(str, avr_condition_strings[cond->conditions[condidx]][0], len-1);
 		condidx ++;
 	}
 
 	/* EOL, return the string */
-	strncat(str, ", ", len);
+	safe_strlcat(str, ", ", len-1);
 	return( str );
 }
 
@@ -663,14 +663,14 @@ void print_parsed_input( avparser_out *avp ) {
 	int lineno = 0;
 
 	/* Add the fields */
-	outstr = malloc(4096);
-	memset(outstr, 0x0, 4096);
+	outstr = malloc(4097);
+	memset(outstr, 0x0, 4097);
 
 	/* Walk the readings, convert to string and print out */
 	ptr = avp->readings;
 	while (ptr != NULL) {
 		tstr = avreading_to_string(ptr, 2);
-		strncat(outstr, tstr, 4096);
+		safe_strlcat(outstr, tstr, 4096);
 		free(tstr);
 		ptr = ptr->next;
 		lineno ++;
@@ -683,4 +683,37 @@ void print_parsed_input( avparser_out *avp ) {
 	return;
 }
 	
+
+/* Utility Functions */
+
+/*/////////////////////////////////////////////////////////////////////////////
+//
+// Function     : safe_safe_strlcat
+// Description  : safe string length concatination 
+//                Note: this is a basic version of the BSD safe_strlcat
+//
+// Inputs       : dst - the destination string
+//                src - the source string
+//                dst - the length of the destination string (with 0x0 term)
+// Outputs      : the number of characters copied
+*/
+
+size_t safe_strlcat(char * dst, const char * src, size_t dstsize) {
+
+	/* Local variables */
+	size_t dstlen, srclen, cpylen;
+
+	/* Figure out the length to copy, then copy */
+	srclen = strlen(src);
+	dstlen = strlen(dst);
+	if ( srclen + dstlen + 1 < dstsize ) {
+		cpylen = srclen;
+	} else {
+		cpylen = dstsize - (dstlen + 1);
+	}
+
+	/* Copy and return */
+	strncat(dst, src, cpylen);
+	return(cpylen);
+}
 

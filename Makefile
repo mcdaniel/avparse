@@ -12,7 +12,7 @@ INCLUDES=-I.
 CC=gcc
 CFLAGS=-c $(INCLUDES) -g -Wall 
 LINK=gcc
-LINKFLAGS=-L/opt/local/lib
+LINKFLAGS=-L/opt/local/lib -lfl
 
 #
 # Setup builds
@@ -39,7 +39,7 @@ TARGETS=	avparse
 all : $(TARGETS)
 
 avparse : $(OBJS)
-	$(LINK) $(LINKFLAGS) -o $@ $(OBJS) -lfl
+	$(LINK) $(LINKFLAGS) -o $@ $(OBJS) 
 
 
 $(BISONCODE) : $(BISONFILE)

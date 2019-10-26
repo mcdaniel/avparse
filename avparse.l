@@ -24,7 +24,7 @@
 [A-Z]{4}                                { yylval.strval = strdup(yytext); return AIRPORT; }
 [0-9]{6}Z                               { yylval.strval = strdup(yytext); return ZULUTIME; }
 COR                                     { yylval.strval = strdup(yytext); return CORRECTION; }
-[0-9]{1,2}(SM|NM)                       { yylval.strval = strdup(yytext); return VISIBILITY; }
+[0-9]{1,2}(\/[0-9])?(SM|NM)             { yylval.strval = strdup(yytext); return VISIBILITY; }
 [0-9]{3}[0-9]{2}KT                      { yylval.strval = strdup(yytext); return WIND; }
 [0-9]{3}[0-9]{2}G[0-9]{2}KT             { yylval.strval = strdup(yytext); return WINDGUST; }
 [-+]?(VC|BC|BL|DR|FZ|MI|PR|SH|TS|DZ|GR|GS|IC|PL|RA|SG|SN|UP|BR|DU|FG|FU|HZ|PY|SA|VA|DS|FC|PO|SQ|SS){1,4} { yylval.strval = strdup(yytext); return CONDITION; }
