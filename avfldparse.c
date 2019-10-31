@@ -551,8 +551,22 @@ char * avreading_to_string( avreading *avr, int ind ) {
 	/* Process the weather conditions */
 	condptr = avr->rcond;
 	while ( condptr != NULL ) {
+
+		/* Indent the first condition */
+		if ( condptr == avr->rcond ) {	
+			snprintf(tempstr, 256, "%*s", ind, "");
+			safe_strlcat(outstr, tempstr, 1024);
+		} else {
+			safe_strlcat(outstr, "; ", 1024);		
+		}
+
+		/* Encode the condition */
+		tempstr[0] = 0x0;
 		avreading_condition_to_string(condptr, tempstr, 256);
 		safe_strlcat(outstr, tempstr, 1024);
+		if ( condptr->next == NULL ) {
+			safe_strlcat(outstr, "\n", 1024);
+		}
 		condptr = condptr->next;
 	}
  
@@ -576,7 +590,7 @@ char * avreading_to_string( avreading *avr, int ind ) {
 	}
 
 	/* Temperature, Dewpoint */
-	snprintf(tempstr, 256, "%*sTemperature: %d Celsisus, %d, Fahrenheit\n", ind, "", 
+	snprintf(tempstr, 256, "%*sTemperature: %d Celsisus, %d Fahrenheit\n", ind, "", 
 		avr->rtemp.temperature_celsisus, avr->rtemp.temperature_fahrenheit);
 	safe_strlcat(outstr, tempstr, 1024);
 	snprintf(tempstr, 256, "%*sDew point: %d Celsisus, %d, Fahrenheit\n", ind, "", 
@@ -623,7 +637,7 @@ char * avreading_condition_to_string( avreading_condition *cond, char *str, size
 
 	/* Now add the conditions */
 	condidx = 0;
-	while ( cond->conditions[condidx] != AVR_CONDITION_UN ) {
+	while ( (condidx < AVR_MAX_CONDS) && (cond->conditions[condidx] != AVR_CONDITION_UN) ) {
 
 		/* Check for errored condition */
 		if ( cond->conditions[condidx] >= AVR_CONDITION_MAX ) {
@@ -642,7 +656,6 @@ char * avreading_condition_to_string( avreading_condition *cond, char *str, size
 	}
 
 	/* EOL, return the string */
-	safe_strlcat(str, ", ", len-1);
 	return( str );
 }
 
