@@ -18,7 +18,7 @@
 
 // Definitions
 #define YYDEBUG 1 // Enable parsing 
-#define AVPARSE_ARGUMENTS "hdf:"
+#define AVPARSE_ARGUMENTS "htdf:"
 #define AVPARSE_USAGE \
     "\nUSAGE: avparse [-f <input file>] [-h] [-d]\n" \
     "\n" \
@@ -31,6 +31,10 @@
 void yyerror(char *s);
 extern char *yytext;
 
+avparser_out * avreading_metar_parse( FILE *in, char *metar );
+
+
+/* Global data */
 avparser_out *avout;
 FILE *yyin;
 
@@ -153,13 +157,13 @@ covexpr: COVERAGE {
 	}
 	;
 
-
 %%
 
 int main(int argc, char **argv) {
 
 	// Local variables
 	char ch, *infile;
+	int test = 0;
 
 	// Process the command line parameters
     while ((ch = getopt(argc, argv, AVPARSE_ARGUMENTS)) != -1) {
@@ -177,28 +181,60 @@ int main(int argc, char **argv) {
             		infile = optarg;
             		break;
 
+            case 't': // Perform the test
+            		test = 1;
+            		break;
+
             default:  // Default (unknown)
                     fprintf( stderr, "Unknown command line option (%c), aborting.\n", ch );
                     return( -1 );
             }
     }
 
-    // Setup the input for the parser
-    if ( infile == NULL ) {
-    	yyin = stdin;
+    // Check for testing of approach
+    if ( test ) {
+       	avreading_metar_parse(NULL, "KUNV 051253Z 05004KT 10SM SKC 05/03 A3042");
     } else {
-    	yyin =  fopen(infile, "r");
+    	avreading_metar_parse((infile == NULL) ? stdin : fopen(infile, "r"), NULL);
     }
 
-	// Setup the base structure, process the inputs
-	avout = allocate_avparser_struct();
-	yyparse();
+	/* Print out and free the structure */
 	print_parsed_input(avout);
 	release_avparser_struct(avout);
 
+	/* Exit the program normally */
 	return( 0 );
 }
 
 void yyerror(char *s) {
   fprintf(stderr, "error: %s, token [%s]\n", s, yytext);
 }
+
+/*/////////////////////////////////////////////////////////////////////////////
+//
+// Function     : avreading_metar_parse
+// Description  : parse a METAR string into structure - note that the 
+//                this can accept several strings seperated by newline
+//
+// Inputs       : fl - file handle for metar input (OR)
+//                metar - the string containing the METAR
+// Outputs      : a pointer to the avreading structure
+*/
+
+avparser_out * avreading_metar_parse( FILE *in, char *metar ) {
+
+	// Setup the input for the parser
+	if ( in == NULL ) {
+		yy_scan_string(metar);
+	} else {
+	   	yyin = in;
+	}
+
+	/* Allocate structure, parse */
+	avout = allocate_avparser_struct();
+	yyparse();
+
+	/* Return the parsed data */
+	return( avout );
+}
+
