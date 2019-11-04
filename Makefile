@@ -13,7 +13,8 @@ CC=gcc
 CFLAGS=-c $(INCLUDES) -g -Wall 
 LINK=gcc
 LINKFLAGS=-L/opt/local/lib -lfl
-
+ARCHIVE=ar
+ARCHFLAGS=cr
 #
 # Setup builds
 
@@ -22,7 +23,7 @@ LEXCODE=	avparse.yy.c
 BISONFILE=	avparse.y
 BISONCODE=	avparse.tab.c
 BISONDEFS=	avparse.tab.h
-OBJS=		$(BISONCODE:.c=.o) \
+LIBOBJS=	$(BISONCODE:.c=.o) \
 			$(LEXCODE:.c=.o) \
 			avfldparse.o
 TARGETS=	avparse
@@ -38,9 +39,11 @@ TARGETS=	avparse
 
 all : $(TARGETS)
 
-avparse : $(OBJS)
-	$(LINK) $(LINKFLAGS) -o $@ $(OBJS) 
+avparse : libavparse.a avparse.o
+	$(LINK) $(LINKFLAGS) avparse.o -o $@ -lavparse
 
+libavparse.a : $(LIBOBJS) 
+	$(ARCHIVE) $(ARCHFLAGS) $@ $(LIBOBJS) 
 
 $(BISONCODE) : $(BISONFILE)
 	bison -d --debug avparse.y

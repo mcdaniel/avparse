@@ -12,12 +12,17 @@ https://business.desu.edu/sites/business/files/document/16/metar_and_taf_codes.p
 
 TODO List
 
-	a) Work on the time string [completed]
-	b) Add correction [COR] - see example METAR
-	c) Add X/YSM visibility to parsing/processing
-	d) Add temperature to processing  [completed]
-	e) Add altimeter setting to processing [completed]
-	f) Add conditions to setttings, e.g., -DZ, -SN, ... (page 11 of desu link above)
-	g) The conditions and coverage lists reorder anything longer than 2 elemetns (need to change this to add new elements onto tail)
-	f) change error handling to something more appopriate 
-	g) Flight - text to speech library - add for text
+	+ change error handling to something more appopriate 
+	+ Flight - text to speech library - add for text
+	+ Move to library so we can link it to other things
+	+ Add TAF/MOS processing
+
+COMPLETED
+
+	+ Work on the time string [completed]
+	+ Add correction [COR] - see example METAR
+	+ Add X/YSM visibility to parsing/processing
+	+ Add temperature to processing  [completed]
+	+ Add altimeter setting to processing [completed]
+	+ Add conditions to setttings, e.g., -DZ, -SN, ... (page 11 of desu link above)
+	+ The conditions and coverage lists reorder anything longer than 2 elemetns (need to change this to add new elements onto tail)

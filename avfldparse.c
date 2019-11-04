@@ -62,6 +62,34 @@ const char *avr_condition_strings[AVR_CONDITION_MAX][2] = {
 
 /****
 
+   Base Parsing Functions 
+
+****/
+
+/*/////////////////////////////////////////////////////////////////////////////
+//
+// Function     : avreading_metar_parse
+// Description  : parse a METAR string into structure - note that the 
+//                this can accept several strings seperated by newline
+//
+// Inputs       : fl - file handle for metar input (OR)
+//                metar - the string containing the METAR
+// Outputs      : a pointer to the avreading structure
+*/
+
+avparser_out * avreading_metar_parse( FILE *in, char *metar ) {
+
+	/* Allocate structure, parse */
+	set_avparser_input( in, metar );
+	avout = allocate_avparser_struct();
+	yyparse();
+
+	/* Return the parsed data */
+	return( avout );
+}
+
+/****
+
    Structure Processing Functions 
 
 ****/

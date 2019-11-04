@@ -19,6 +19,9 @@
 
 /** Functional Prototypes **/
 
+/* Base Parsing Functions */
+avparser_out * avreading_metar_parse( FILE *in, char *metar );
+
 /* Structure Processing Functions */
 avparser_out *        allocate_avparser_struct( void );
 void                  release_avparser_struct( avparser_out *avp );
@@ -39,10 +42,15 @@ char *                avreading_to_string( avreading *avr, int ind );
 char *                avreading_condition_to_string( avreading_condition *cond, char *str, size_t len );
 void                  print_parsed_input( avparser_out *avp );
 
-
 /* Utility Functions */
 size_t                safe_strlcat(char * dst, const char * src, size_t dstsize);
 
+
+/* Lexer/processing bookeeping functions */
+extern void           set_avparser_input( FILE *in, char *metar );
+extern void           yyerror(char *s);
+extern int            yylex(void);
+extern char *         yytext;
 
 #define AVFLDPARSE_INCLUDED
 #endif
