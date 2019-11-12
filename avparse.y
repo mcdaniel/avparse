@@ -157,4 +157,5 @@ void set_avparser_input( FILE *in, char *metar ) {
 	   	yyin = in;
 	}
 
+	return;
 }
