@@ -1,3 +1,6 @@
+
+**NOTE**: this project is deprecated as of 07/24, and will not be updated.
+
 # avparse
 A parser library for FAA and International Aviation Information
 
